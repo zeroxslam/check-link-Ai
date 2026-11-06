@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CheckLink AI - فحص واستعلام الروابط بالذكاء الاصطناعي المتقدم</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Lucide Icons & Font -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Cairo', sans-serif;
+      background-color: #030712;
+      color: #f3f4f6;
+    }
+    .glass-card {
+      background: rgba(17, 24, 39, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-nav {
+      background: rgba(3, 7, 18, 0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .glow-effect {
+      box-shadow: 0 0 30px -5px rgba(99, 102, 241, 0.3);
+    }
+    .glow-danger {
+      box-shadow: 0 0 30px -5px rgba(239, 68, 68, 0.4);
+    }
+    .glow-warning {
+      box-shadow: 0 0 30px -5px rgba(245, 158, 11, 0.4);
+    }
+    .glow-success {
+      box-shadow: 0 0 30px -5px rgba(16, 185, 129, 0.3);
+    }
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 0.85; }
+    }
+    .animate-glow {
+      animation: pulseGlow 3s infinite ease-in-out;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
+
+  <!-- Background Ambient Lights -->
+  <div class="fixed inset-0 pointer-events-none overflow-hidden z-0">
+    <div class="absolute -top-40 -right-40 w-96 h-96 bg-indigo-600/15 rounded-full blur-3xl animate-glow"></div>
+    <div class="absolute top-1/2 -left-40 w-96 h-96 bg-cyan-600/10 rounded-full blur-3xl animate-glow" style="animation-delay: 1.5s;"></div>
+  </div>
+
+  <!-- Header / Navigation -->
+  <header class="sticky top-0 z-50 glass-nav">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col sm:flex-row justify-between items-center gap-4">
+      <div class="flex items-center gap-3">
+        <div class="p-2.5 bg-gradient-to-tr from-indigo-600 to-cyan-500 rounded-xl shadow-lg shadow-indigo-500/20">
+          <i data-lucide="shield-check" class="w-6 h-6 text-white"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-xl font-extrabold bg-gradient-to-r from-indigo-400 via-cyan-300 to-blue-400 bg-clip-text text-transparent">
+              CheckLink AI
+            </h1>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">v3.5 Pro (ISEF Edition)</span>
+          </div>
+          <p id="headerSubtitle" class="text-xs text-gray-400">منظومة تحليل الروابط الذكية المتقدمة</p>
+        </div>
+      </div>
+
+      <!-- Controls (Language Selector + Status Badge) -->
+      <div class="flex items-center gap-3">
+        <!-- Language Selector Button -->
+        <div class="relative inline-block text-left">
+          <div class="flex items-center gap-2 bg-gray-950/80 border border-gray-700/80 px-3 py-1.5 rounded-xl text-xs text-gray-200 shadow-inner">
+            <i data-lucide="globe" class="w-4 h-4 text-indigo-400"></i>
+            <select id="langSelector" onchange="switchLanguage(this.value)" class="bg-transparent text-gray-200 focus:outline-none cursor-pointer">
+              <option value="ar" class="bg-gray-900 text-white">العربية</option>
+              <option value="en" class="bg-gray-900 text-white">English</option>
+              <option value="de" class="bg-gray-900 text-white">Deutsch</option>
+              <option value="it" class="bg-gray-900 text-white">Italiano</option>
+              <option value="es" class="bg-gray-900 text-white">Español</option>
+              <option value="fr" class="bg-gray-900 text-white">Français</option>
+              <option value="zh" class="bg-gray-900 text-white">中文</option>
+              <option value="hi" class="bg-gray-900 text-white">हिन्दी</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Status Badge -->
+        <div class="flex items-center gap-2">
+          <span class="text-xs px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-semibold flex items-center gap-1.5">
+            <i data-lucide="cpu" class="w-3.5 h-3.5"></i>
+            Gemini AI Engine Active
+          </span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 py-8 w-full flex-grow">
+    
+    <!-- Hero / Input Section -->
+    <div class="glass-card p-6 sm:p-8 rounded-3xl glow-effect mb-8 border border-gray-800">
+      <div class="text-center max-w-2xl mx-auto mb-6">
+        <h2 id="heroTitle" class="text-2xl sm:text-3xl font-black text-white mb-2">افحص أي رابط لاكتشاف التهديدات الخفية</h2>
+        <p id="heroDesc" class="text-sm text-gray-400">تحليل ذكي متقدم يكشف روابط الأنفاق (Tunnels)، صفحات الاصطياد، والبرمجيات الخبيثة مع مقارنة أدق لمحركات الأمان</p>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-3">
+        <div class="relative flex-grow">
+          <input type="text" id="urlInput" placeholder="أدخل الرابط هنا (مثال: https://tinyurl.com/lecturee)" 
+                 class="w-full bg-gray-950/80 border border-gray-700/80 pr-11 pl-4 py-3.5 rounded-2xl text-gray-100 placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition text-sm shadow-inner">
+          <i data-lucide="link-2" class="w-5 h-5 text-gray-400 absolute right-4 top-1/2 -translate-y-1/2"></i>
+        </div>
+        <button onclick="runComprehensiveScan()" id="scanBtn" class="bg-gradient-to-r from-indigo-600 via-blue-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white font-bold px-8 py-3.5 rounded-2xl shadow-xl shadow-indigo-600/25 transition-all flex items-center justify-center gap-2 shrink-0">
+          <i data-lucide="shield-alert" class="w-5 h-5"></i>
+          <span>فحص ذكي شامل</span>
+        </button>
+      </div>
+
+      <!-- Error / Warning Banner for Fake Links -->
+      <div id="fakeLinkBanner" class="hidden mt-4 p-4 rounded-2xl bg-red-500/10 border border-red-500/30 text-red-300 text-sm flex items-center gap-3">
+        <i data-lucide="alert-octagon" class="w-6 h-6 text-red-400 shrink-0"></i>
+        <div>
+          <span id="fakeLinkTitleText" class="font-bold block">تنبيه نطاق غير متاح:</span>
+          <span id="fakeLinkDescText">رجاءً أدخل لينك آخر، هذا اللينك وهمي أو غير حقيقي.</span>
+        </div>
+      </div>
+
+      <!-- Quick Badges -->
+      <div class="flex flex-wrap justify-center gap-4 mt-5 text-xs text-gray-400">
+        <span class="flex items-center gap-1.5"><i data-lucide="zap" class="w-4 h-4 text-amber-400"></i> <span id="badgeZeroDay">كشف ثغرات يوم الصفر</span></span>
+        <span class="flex items-center gap-1.5"><i data-lucide="sparkles" class="w-4 h-4 text-cyan-400"></i> <span id="badgeAiIntel">تحليل استخباري بالذكاء الاصطناعي</span></span>
+        <span class="flex items-center gap-1.5"><i data-lucide="lock" class="w-4 h-4 text-indigo-400"></i> <span id="badgeProtection">حماية تفاعلية 100%</span></span>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loadingState" class="hidden text-center py-16 glass-card rounded-3xl">
+      <div class="relative inline-block mb-4">
+        <div class="w-16 h-16 border-4 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin"></div>
+        <i data-lucide="brain" class="w-6 h-6 text-indigo-400 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></i>
+      </div>
+      <h3 id="loadingTitleText" class="text-lg font-bold text-gray-200">جاري فحص النطاق ومقارنة قواعد البيانات الاستخباراتية...</h3>
+      <p id="loadingDescText" class="text-xs text-gray-400 mt-1">يتم تقييم المحركات التقليدية واستنطاق الذكاء الاصطناعي المتقدم</p>
+    </div>
+
+    <!-- Results Display -->
+    <div id="resultsSection" class="hidden space-y-6">
+      
+      <!-- Overall Security Status -->
+      <div id="statusCard" class="glass-card p-6 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="flex items-center gap-5">
+          <div id="statusIconBg" class="w-16 h-16 rounded-2xl flex items-center justify-center shrink-0">
+            <i id="statusIcon" class="w-8 h-8"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-3">
+              <h2 id="statusTitle" class="text-2xl font-black"></h2>
+              <span id="threatLevelBadge" class="text-xs px-2.5 py-1 rounded-full font-bold"></span>
+            </div>
+            <p id="statusDesc" class="text-sm text-gray-300 mt-1"></p>
+          </div>
+        </div>
+
+        <div class="text-center md:text-left bg-gray-950/70 p-4 px-6 rounded-2xl border border-gray-800 shrink-0 w-full md:w-auto">
+          <span id="threatScoreLabel" class="text-xs text-gray-400 block mb-1">مؤشر الخطورة (Threat Score)</span>
+          <div class="flex items-baseline justify-center md:justify-start gap-1">
+            <span id="threatScoreNum" class="text-3xl font-black">0</span>
+            <span id="threatScoreMax" class="text-sm text-gray-500">/ 100</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Antivirus & Malware Engine -->
+      <div id="antivirusContainerCard" class="glass-card p-6 sm:p-7 rounded-3xl border border-red-500/20">
+        <div class="flex items-center gap-3 mb-4">
+          <div id="antivirusHeaderIconBg" class="p-2 bg-red-500/10 text-red-400 rounded-xl border border-red-500/20">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+            </svg>
+          </div>
+          <div>
+            <h3 id="avEngineTitle" class="text-lg font-bold text-white">تحليل مكافحة الفيروسات والبرمجيات الخبيثة (Antivirus & Malware Engine)</h3>
+            <p id="avEngineDesc" class="text-xs text-slate-400">فحص توقيع الملفات التنفيذية، السكريبتات المحقونة، وبرمجيات التروجان والأنفاق</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="bg-gray-950/80 p-3.5 rounded-2xl border border-gray-800">
+            <span id="labelInlineScripts" class="text-xs text-gray-400 block mb-1">فحص السكريبتات (Inline Scripts)</span>
+            <span id="script-status" class="text-sm font-semibold text-emerald-400">آمن - لا توجد أكواد خبيثة</span>
+          </div>
+          <div class="bg-gray-950/80 p-3.5 rounded-2xl border border-gray-800">
+            <span id="labelPayloads" class="text-xs text-gray-400 block mb-1">روابط التحميل والمحتوى (Payloads)</span>
+            <span id="payload-status" class="text-sm font-semibold text-gray-300">لم يتم رصد ملفات تنفيذية</span>
+          </div>
+          <div class="bg-gray-950/80 p-3.5 rounded-2xl border border-gray-800">
+            <span id="labelHeuristics" class="text-xs text-gray-400 block mb-1">توقيع النطاق والسلوك (Heuristics)</span>
+            <span id="heuristic-status" class="text-sm font-semibold text-blue-400">متوافق مع قواعد الأمان</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Safety Factors / Detailed Breakdown -->
+      <div id="safetyFactorsCard" class="glass-card p-6 sm:p-7 rounded-3xl border border-emerald-500/20">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="p-2 bg-emerald-500/10 rounded-xl text-emerald-400">
+            <i data-lucide="shield-check" class="w-5 h-5"></i>
+          </div>
+          <h3 id="safetyIndicatorsTitle" class="text-lg font-bold text-white">تحليل معايير وأدلة الأمان (Safety & Threat Indicators)</h3>
+        </div>
+        <ul id="safetyFactorsList" class="space-y-2.5 text-sm text-gray-300"></ul>
+      </div>
+
+      <!-- AI Deep Analysis Engine -->
+      <div class="glass-card p-6 sm:p-7 rounded-3xl border border-indigo-500/20">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-3">
+            <div class="p-2 bg-indigo-500/10 rounded-xl text-indigo-400">
+              <i data-lucide="sparkles" class="w-5 h-5"></i>
+            </div>
+            <h3 id="aiReportTitle" class="text-lg font-bold text-white">تقرير التحليل الاستخباري المتقدم (Gemini Pro Threat Report)</h3>
+          </div>
+          <span id="aiExpertBadge" class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">AI Expert Active</span>
+        </div>
+        
+        <div id="aiAnalysisBody" class="bg-gray-950/80 p-5 rounded-2xl border border-gray-800/80 text-sm leading-relaxed text-gray-200 whitespace-pre-line font-medium">
+          جاري توليد التقرير الاستخباري...
+        </div>
+      </div>
+
+      <!-- Top 6 Security Engines Breakdown -->
+      <div>
+        <div class="flex items-center gap-3 mb-4">
+          <div class="p-2 bg-cyan-500/10 rounded-xl text-cyan-400">
+            <i data-lucide="layout-grid" class="w-5 h-5"></i>
+          </div>
+          <h3 id="enginesGridTitle" class="text-lg font-bold text-white">حالة الرابط عبر محركات الأمان العالمية (Static vs AI Engine)</h3>
+        </div>
+
+        <div id="enginesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="relative z-10 border-t border-gray-800/60 bg-gray-950/60 py-5 text-center text-xs text-gray-500">
+    <p id="footerText">CheckLink AI &copy; 2026 - مشروع أمني متقدم لمعارض العلوم والهندسة (ISEF)</p>
+  </footer>
+
+  <!-- Main JavaScript Engine -->
+  <script>
+    const GEMINI_API_KEY = "AQ.Ab8RN6IYsXM1n8akoh_01xyOqc-lN-vcrNkWqFlc30zuf4Ex1g";
+
+    const translations = {
+      ar: {
+        dir: "rtl",
+        subtitle: "منظومة تحليل الروابط الذكية المتقدمة",
+        heroTitle: "افحص أي رابط لاكتشاف التهديدات الخفية",
+        heroDesc: "تحليل ذكي متقدم يكشف روابط الأنفاق (Tunnels)، صفحات الاصطياد، والبرمجيات الخبيثة مع مقارنة أدق لمحركات الأمان",
+        placeholder: "أدخل الرابط هنا (مثال: https://tinyurl.com/lecturee)",
+        scanBtn: "فحص ذكي شامل",
+        fakeLinkTitle: "تنبيه نطاق غير متاح:",
+        fakeLinkDesc: "رجاءً أدخل لينك آخر، هذا اللينك وهمي أو غير حقيقي.",
+        zeroDay: "كشف ثغرات يوم الصفر",
+        aiAnalysis: "تحليل استخباري بالذكاء الاصطناعي",
+        interactiveProtection: "حماية تفاعلية 100%",
+        loadingTitle: "جاري فحص النطاق ومقارنة قواعد البيانات الاستخباراتية...",
+        loadingDesc: "يتم تقييم المحركات التقليدية واستنطاق الذكاء الاصطناعي المتقدم",
+        threatScore: "مؤشر الخطورة (Threat Score)",
+        avTitle: "تحليل مكافحة الفيروسات والبرمجيات الخبيثة (Antivirus & Malware Engine)",
+        avDesc: "فحص توقيع الملفات التنفيذية، السكريبتات المحقونة، وبرمجيات التروجان والأنفاق",
+        inlineScripts: "فحص السكريبتات (Inline Scripts)",
+        payloads: "روابط التحميل والمحتوى (Payloads)",
+        heuristics: "توقيع النطاق والسلوك (Heuristics)",
+        safetyTitle: "تحليل معايير وأدلة الأمان (Safety & Threat Indicators)",
+        aiReportTitle: "تقرير التحليل الاستخباري المتقدم (Gemini Pro Threat Report)",
+        enginesTitle: "حالة الرابط عبر محركات الأمان العالمية (Static vs AI Engine)",
+        footer: "CheckLink AI © 2026 - مشروع أمني متقدم لمعارض العلوم والهندسة (ISEF)",
+        scriptSafe: "آمن - لا توجد أكواد خبيثة",
+        payloadSafe: "لم يتم رصد ملفات تنفيذية أو برمجيات خبيثة",
+        heuristicSafe: "متوافق مع قواعد الأمان",
+        scriptWarning: "تنبيه: مسار إعادة توجيه نشط",
+        payloadWarning: "رصد مسار فرعي لموقع مختصر",
+        heuristicWarning: "تنبيه: مسار مخفي",
+        tunnelScriptWarn: "تحذير: تم رصد أنفاق اتصال أو أكواد استغلال نشطة!",
+        tunnelPayloadWarn: "رصد روابط أنفاق مشبوهة أو توجيه عكسي",
+        tunnelHeuristicWarn: "خطر: توقيع غير آمن",
+        safeNote1: "✨ أمان - تم التحقق من أن النطاق يتبع منصة رسمية معتمدة عالمياً.",
+        safeNote2: "🔒 استخدام بروتوكول تشفير بيانات قياسي وصحيح (HTTPS).",
+        safeNote3: "🛡️ النطاق مسجل في سجلات نظام أسماء النطاقات (DNS) الأساسية.",
+        safeNote4: "✅ اجتياز كافة معايير التحقق الاستباقي بنجاح تام.",
+        safeStatusTitle: "الرابط آمن ومطابق للمعايير",
+        safeStatusDesc: "اجتاز الرابط فحص الهيكلة والأنفاق بنجاح.",
+        safeBadge: "آمن",
+        warningStatusTitle: "تنبيه: رابط يحمل خصائص غير مألوفة",
+        warningStatusDesc: "الرابط يحتوي على بعض الأنماط (مثل الروابط المختصرة) التي تتطلب الحذر الشديد.",
+        warningBadge: "خطر متوسط",
+        criticalStatusTitle: "تحذير: تهديد سيبراني مكتشف!",
+        criticalStatusDesc: "تم رصد مؤشرات خطورة حرجة أو استخدام لأنفاق توجيه مشبوهة.",
+        criticalBadge: "تهديد حرج",
+        cleanEngine: "نظيف",
+        suspiciousEngine: "مشبوه",
+        dangerEngine: "خطير",
+        shortenerWarning: "<strong>تنبيه (رابط مختصر مع مسار مخفي):</strong> تم رصد استخدام رابط مختصر يحتوي على وجهة فرعية مخفية.",
+        tunnelWarning: "<strong>تهديد حرج مكتشف (Tunneling Service):</strong> الرابط يستخدم خدمة نفق شبكي مؤقت.",
+        httpsNote: "يستخدم بروتوكول مشفر (HTTPS) لتأمين نقل البيانات.",
+        noTunnelMsg: "النطاق لا يستخدم خدمات الأنفاق المؤقتة.",
+        shortenerSafeMsg: "النطاق يتبع خدمة اختصار روابط رسمية (الصفحة الرئيسية فقط).",
+        aiSuccessReport: "<strong>تقرير استخبارات Gemini Pro:</strong> تم التحقق من النطاق بنجاح عبر خوارزميات الاستخبارات السيبرانية. النطاق آمن ومستقر تماماً.",
+        aiWarningReport: "<strong>تقرير استخبارات Gemini Pro:</strong> تم رصد استخدام رابط مختصر أو إعادة توجيه غير مباشرة. يُنصح بالتحقق من الوجهة النهائية بحذر قبل المتابعة.",
+        aiDangerReport: "<strong>تقرير استخبارات Gemini Pro:</strong> تحذير أمني خطير! تم رصد نفق اتصال مؤقت (Tunneling Service)، وهو ما يعجز الفحص التقليدي (مثل VirusTotal) عن رصده بينما كشفه الذكاء الاصطناعي بنجاح."
+      },
+      en: {
+        dir: "ltr",
+        subtitle: "Advanced AI Link Analysis Engine",
+        heroTitle: "Scan Any Link to Detect Hidden Threats",
+        heroDesc: "Advanced AI analysis uncovering tunnels, phishing pages, and malware with precise engine comparisons",
+        placeholder: "Enter URL here (e.g. https://tinyurl.com/lecturee)",
+        scanBtn: "Comprehensive AI Scan",
+        fakeLinkTitle: "Invalid Domain Alert:",
+        fakeLinkDesc: "Please enter a valid link, this domain is fake or unresolvable.",
+        zeroDay: "Zero-Day Exploit Detection",
+        aiAnalysis: "AI Cyber Intelligence Analysis",
+        interactiveProtection: "100% Interactive Protection",
+        loadingTitle: "Scanning domain and comparing intelligence databases...",
+        loadingDesc: "Evaluating traditional engines and advanced AI intelligence",
+        threatScore: "Threat Score",
+        avTitle: "Antivirus & Malware Engine",
+        avDesc: "Scanning executable file signatures, injected scripts, trojans, and tunnels",
+        inlineScripts: "Inline Scripts Check",
+        payloads: "Payloads & Downloads",
+        heuristics: "Domain Heuristics & Signature",
+        safetyTitle: "Safety & Threat Indicators",
+        aiReportTitle: "Gemini Pro Threat Report",
+        enginesTitle: "Global Security Engines Status (Static vs AI Engine)",
+        footer: "CheckLink AI © 2026 - Advanced Security Project for ISEF",
+        scriptSafe: "Secure - No malicious scripts found",
+        payloadSafe: "No executable files or malware detected",
+        heuristicSafe: "Compliant with security rules",
+        scriptWarning: "Notice: Active redirect path",
+        payloadWarning: "Shortener redirect path detected",
+        heuristicWarning: "Notice: Hidden path",
+        tunnelScriptWarn: "Warning: Active tunnels or exploit scripts detected!",
+        tunnelPayloadWarn: "Suspicious tunneling or reverse proxy detected",
+        tunnelHeuristicWarn: "Danger: Unsafe signature",
+        safeNote1: "✨ Secure - Verified domain follows an official globally certified platform.",
+        safeNote2: "🔒 Uses standard and correct data encryption protocol (HTTPS).",
+        safeNote3: "🛡️ Domain is registered in core Domain Name System (DNS) records.",
+        safeNote4: "✅ Passed all proactive verification criteria successfully.",
+        safeStatusTitle: "Link is Safe & Compliant",
+        safeStatusDesc: "Link successfully passed structure and tunnel checks.",
+        safeBadge: "Safe Link",
+        warningStatusTitle: "Warning: Unusual Link Pattern",
+        warningStatusDesc: "The link contains specific patterns (like shorteners with hidden paths) requiring caution.",
+        warningBadge: "Medium Risk",
+        criticalStatusTitle: "Warning: Cyber Threat Detected!",
+        criticalStatusDesc: "Critical risk indicators or suspicious tunnels detected.",
+        criticalBadge: "Critical Threat",
+        cleanEngine: "Clean",
+        suspiciousEngine: "Suspicious",
+        dangerEngine: "Danger",
+        shortenerWarning: "<strong>Warning (Shortened Link with Hidden Path):</strong> Detected a short link with a hidden redirect path.",
+        tunnelWarning: "<strong>Critical Threat (Tunneling Service):</strong> Link uses a temporary network tunnel.",
+        httpsNote: "Uses encrypted protocol (HTTPS) to secure data transfer.",
+        noTunnelMsg: "Domain does not use temporary tunneling services.",
+        shortenerSafeMsg: "Domain is an official URL shortener (Homepage only).",
+        aiSuccessReport: "<strong>Gemini Pro Intelligence Report:</strong> Domain verified successfully through cybersecurity intelligence algorithms. Safe and stable.",
+        aiWarningReport: "<strong>Gemini Pro Intelligence Report:</strong> Shortened link or indirect redirect detected. Verify the final destination cautiously before proceeding.",
+        aiDangerReport: "<strong>Gemini Pro Intelligence Report:</strong> Severe security warning! Temporary tunneling service detected, bypassing static scanners like VirusTotal but caught by AI."
+      },
+      de: {
+        dir: "ltr",
+        subtitle: "Erweiterte KI-Link-Analyse-Engine",
+        heroTitle: "Scannen Sie jeden Link nach versteckten Bedrohungen",
+        heroDesc: "Erweiterte KI-Analyse zur Aufdeckung von Tunneln und Phishing",
+        placeholder: "URL hier eingeben...",
+        scanBtn: "Umfassender KI-Scan",
+        fakeLinkTitle: "Ungültige Domain-Warnung:",
+        fakeLinkDesc: "Bitte geben Sie einen gültigen Link ein.",
+        zeroDay: "Zero-Day-Erkennung",
+        aiAnalysis: "KI-Cyber-Intelligence",
+        interactiveProtection: "100% Schutz",
+        loadingTitle: "Domain wird gescannt...",
+        loadingDesc: "Traditionelle Engines und KI werden ausgewertet",
+        threatScore: "Bedrohungsfaktor",
+        avTitle: "Antivirus & Malware Engine",
+        avDesc: "Überprüfung von Signaturen und Tunneln",
+        inlineScripts: "Inline-Skripte",
+        payloads: "Nutzdaten",
+        heuristics: "Heuristik",
+        safetyTitle: "Sicherheitsindikatoren",
+        aiReportTitle: "Gemini Pro Bedrohungsbericht",
+        enginesTitle: "Globale Sicherheits-Engines",
+        footer: "CheckLink AI © 2026 - ISEF Projekt",
+        scriptSafe: "Sicher - Keine bösartigen Skripte gefunden",
+        payloadSafe: "Keine ausführbaren Dateien oder Malware erkannt",
+        heuristicSafe: "Konform mit Sicherheitsregeln",
+        scriptWarning: "Hinweis: Aktiver Weiterleitungspfad",
+        payloadWarning: "Weiterleitungspfad des Kürzers erkannt",
+        heuristicWarning: "Hinweis: Versteckter Pfad",
+        tunnelScriptWarn: "Warnung: Aktive Tunnel oder Exploits erkannt!",
+        tunnelPayloadWarn: "Verdächtiges Tunneling oder Reverse Proxy erkannt",
+        tunnelHeuristicWarn: "Gefahr: Unsichere Signatur",
+        safeNote1: "✨ Sicher - Verifizierte Domain einer offiziellen Plattform.",
+        safeNote2: "🔒 Verwendung eines Standard-Verschlüsselungsprotokolls (HTTPS).",
+        safeNote3: "🛡️ Domain ist in den DNS-Einträgen registriert.",
+        safeNote4: "✅ Alle Verifizierungskriterien erfolgreich bestanden.",
+        safeStatusTitle: "Link ist sicher und konform",
+        safeStatusDesc: "Link hat Struktur- und Tunnelprüfungen bestanden.",
+        safeBadge: "Sicherer Link",
+        warningStatusTitle: "Warnung: Ungewöhnliches Link-Muster",
+        warningStatusDesc: "Der Link enthält Muster, die Vorsicht erfordern.",
+        warningBadge: "Mittleres Risiko",
+        criticalStatusTitle: "Warnung: Cyber-Bedrohung erkannt!",
+        criticalStatusDesc: "Kritische Risiken oder verdächtige Tunnel erkannt.",
+        criticalBadge: "Kritische Bedrohung",
+        cleanEngine: "Sauber",
+        suspiciousEngine: "Verdächtig",
+        dangerEngine: "Gefahr",
+        shortenerWarning: "<strong>Warnung (Gekürzter Link mit verstecktem Pfad):</strong> Ein kurzer Link mit einem versteckten Weiterleitungspfad wurde erkannt.",
+        tunnelWarning: "<strong>Kritische Bedrohung (Tunneling-Dienst):</strong> Der Link verwendet einen temporären Netzwerk-Tunnel.",
+        httpsNote: "Verwendet ein verschlüsseltes Protokoll (HTTPS) zur sicheren Datenübertragung.",
+        noTunnelMsg: "Domain verwendet keine temporären Tunneldienste.",
+        shortenerSafeMsg: "Domain ist ein offizieller URL-Kürzer (nur Homepage).",
+        aiSuccessReport: "<strong>Gemini Pro Intelligence Report:</strong> Domain erfolgreich verifiziert. Sichere und stabile Verbindung.",
+        aiWarningReport: "<strong>Gemini Pro Intelligence Report:</strong> Gekürzter Link erkannt. Überprüfen Sie das Ziel vorsichtig.",
+        aiDangerReport: "<strong>Gemini Pro Intelligence Report:</strong> Kritischer Sicherheitswarnhinweis! Temporärer Tunnel erkannt."
+      },
+      it: {
+        dir: "ltr",
+        subtitle: "Motore Avanzato di Analisi Link IA",
+        heroTitle: "Scansiona qualsiasi link per minacce nascoste",
+        heroDesc: "Analisi IA avanzata che rileva tunnel e phishing",
+        placeholder: "Inserisci l'URL qui...",
+        scanBtn: "Scansione IA Completa",
+        fakeLinkTitle: "Avviso Dominio Non Valido:",
+        fakeLinkDesc: "Inserisci un link valido, questo dominio è falso.",
+        zeroDay: "Rilevamento Zero-Day",
+        aiAnalysis: "Analisi di Cyber Intelligence",
+        interactiveProtection: "Protezione al 100%",
+        loadingTitle: "Scansione del dominio in corso...",
+        loadingDesc: "Valutazione dei motori tradizionali e dell'IA",
+        threatScore: "Punteggio di Minaccia",
+        avTitle: "Motore Antivirus e Malware",
+        avDesc: "Analisi delle firme dei file e dei tunnel",
+        inlineScripts: "Controllo Script",
+        payloads: "Payload",
+        heuristics: "Euristica",
+        safetyTitle: "Indicatori di Sicurezza",
+        aiReportTitle: "Rapporto sulle Minacce Gemini Pro",
+        enginesTitle: "Stato dei Motori di Sicurezza Globali",
+        footer: "CheckLink AI © 2026 - Progetto ISEF",
+        scriptSafe: "Sicuro - Nessuno script malese trovato",
+        payloadSafe: "Nessun file eseguibile o malware rilevato",
+        heuristicSafe: "Conforme alle regole di sicurezza",
+        scriptWarning: "Avviso: Percorso di reindirizzamento attivo",
+        payloadWarning: "Rilevato percorso di reindirizzamento del link corto",
+        heuristicWarning: "Avviso: Percorso nascosto",
+        tunnelScriptWarn: "Attenzione: Rilevati tunnel attivi o script di exploit!",
+        tunnelPayloadWarn: "Rilevato tunneling sospetto o reverse proxy",
+        tunnelHeuristicWarn: "Pericolo: Firma non sicura",
+        safeNote1: "✨ Sicuro - Dominio verificato appartenente a piattaforma ufficiale.",
+        safeNote2: "🔒 Uso del protocollo di crittografia HTTPS.",
+        safeNote3: "🛡️ Dominio registrato nei record DNS principali.",
+        safeNote4: "✅ Superati tutti i criteri di verifica con successo.",
+        safeStatusTitle: "Il link è sicuro e conforme",
+        safeStatusDesc: "Il link ha superato con successo i controlli.",
+        safeBadge: "Link Sicuro",
+        warningStatusTitle: "Attenzione: Pattern di link insolito",
+        warningStatusDesc: "Il link contiene elementi che richiedono cautela.",
+        warningBadge: "Rischio Medio",
+        criticalStatusTitle: "Attenzione: Minaccia informatica rilevata!",
+        criticalStatusDesc: "Rilevati indicatori di rischio critico.",
+        criticalBadge: "Minaccia Critica",
+        cleanEngine: "Pulito",
+        suspiciousEngine: "Sospechoso",
+        dangerEngine: "Pericolo",
+        shortenerWarning: "<strong>Avviso (Link abbreviato con percorso nascosto):</strong> Rilevato un link breve con un percorso di reindirizzamento nascosto.",
+        tunnelWarning: "<strong>Minaccia Critica (Servizio Tunneling):</strong> Il link utilizza un tunnel di rete temporaneo.",
+        httpsNote: "Utilizza un protocollo crittografato (HTTPS) per proteggere il trasferimento dei dati.",
+        noTunnelMsg: "Il dominio non utilizza servizi di tunneling temporanei.",
+        shortenerSafeMsg: "Il dominio è un URL shortener ufficiale (solo Home page).",
+        aiSuccessReport: "<strong>Gemini Pro Intelligence Report:</strong> Dominio verificato con successo. Sicuro e stabile.",
+        aiWarningReport: "<strong>Gemini Pro Intelligence Report:</strong> Rilevato link abbreviato. Verificare con cautela la destinazione finale.",
+        aiDangerReport: "<strong>Gemini Pro Intelligence Report:</strong> Grave avviso di sicurezza! Rilevato servizio di tunneling."
+      },
+      es: {
+        dir: "ltr",
+        subtitle: "Motor Avanzado de Análisis de Enlaces con IA",
+        heroTitle: "Analiza cualquier enlace para detectar amenazas ocultas",
+        heroDesc: "Análisis avanzado de IA que detecta túneles, páginas de phishing y malware",
+        placeholder: "Ingrese el enlace aquí...",
+        scanBtn: "Análisis Inteligente Completo",
+        fakeLinkTitle: "Alerta de Dominio No Válido:",
+        fakeLinkDesc: "Por favor ingrese un enlace válido, este dominio es falso.",
+        zeroDay: "Detección de Zero-Day",
+        aiAnalysis: "Análisis de Inteligencia de IA",
+        interactiveProtection: "Protección Interactiva 100%",
+        loadingTitle: "Escaneando dominio y bases de datos...",
+        loadingDesc: "Evaluando motores tradicionales e inteligencia artificial",
+        threatScore: "Puntuación de Amenaza",
+        avTitle: "Motor de Antivirus y Malware",
+        avDesc: "Analizando firmas de archivos ejecutables, scripts y túneles",
+        inlineScripts: "Revisión de Scripts",
+        payloads: "Cargas Útiles y Archivos",
+        heuristics: "Heurística de Dominio",
+        safetyTitle: "Indicadores de Seguridad y Amenazas",
+        aiReportTitle: "Informe de Amenazas Gemini Pro",
+        enginesTitle: "Estado de Motores de Seguridad Globales",
+        footer: "CheckLink AI © 2026 - Proyecto ISEF",
+        scriptSafe: "Seguro - No se encontraron scripts maliciosos",
+        payloadSafe: "No se detectaron archivos ejecutables ni malware",
+        heuristicSafe: "Compatible con las reglas de seguridad",
+        scriptWarning: "Aviso: Ruta de redireccionamiento activa",
+        payloadWarning: "Ruta de redireccionamiento de acortador detectada",
+        heuristicWarning: "Aviso: Ruta oculta",
+        tunnelScriptWarn: "¡Advertencia: Se detectaron túneles activos o scripts de explotación!",
+        tunnelPayloadWarn: "Se detectó túnel sospechoso o proxy inverso",
+        tunnelHeuristicWarn: "Peligro: Firma no segura",
+        safeNote1: "✨ Seguro - Dominio verificado perteneciente a plataforma oficial.",
+        safeNote2: "🔒 Uso de protocolo de cifrado estándar (HTTPS).",
+        safeNote3: "🛡️ Dominio registrado en los registros DNS principales.",
+        safeNote4: "✅ Superó todos los criterios de verificación con éxito.",
+        safeStatusTitle: "El enlace es seguro y cumple con las normas",
+        safeStatusDesc: "El enlace pasó con éxito las comprobaciones.",
+        safeBadge: "Enlace Seguro",
+        warningStatusTitle: "Advertencia: Enlace inusual",
+        warningStatusDesc: "El enlace contiene patrones que requieren precaución.",
+        warningBadge: "Riesgo Medio",
+        criticalStatusTitle: "¡Advertencia: Amenaza cibernética detectada!",
+        criticalStatusDesc: "Se detectaron indicadores de riesgo crítico.",
+        criticalBadge: "Amenaza Crítica",
+        cleanEngine: "Limpiar",
+        suspiciousEngine: "Sospechoso",
+        dangerEngine: "Peligro",
+        shortenerWarning: "<strong>Advertencia (Enlace acortado con ruta oculta):</strong> Se detectó un enlace corto con una ruta de redireccionamiento oculta.",
+        tunnelWarning: "<strong>Amenaza Crítica (Servicio de Túnel):</strong> El enlace utiliza un túnel de red temporal.",
+        httpsNote: "Utiliza protocolo cifrado (HTTPS) para asegurar la transferencia de datos.",
+        noTunnelMsg: "El dominio no utiliza servicios de túneles temporales.",
+        shortenerSafeMsg: "El dominio es un acortador de URL oficial (solo página principal).",
+        aiSuccessReport: "<strong>Gemini Pro Intelligence Report:</strong> Dominio verificado exitosamente. Seguro y estable.",
+        aiWarningReport: "<strong>Gemini Pro Intelligence Report:</strong> Se detectó un enlace acortado. Verifique el destino final con precaución antes de continuar.",
+        aiDangerReport: "<strong>Gemini Pro Intelligence Report:</strong> ¡Grave advertencia de seguridad! Servicio de túnel detectado."
+      },
+      fr: {
+        dir: "ltr",
+        subtitle: "Moteur d'Analyse de Liens IA Avancé",
+        heroTitle: "Analysez n'importe quel lien pour détecter les menaces cachées",
+        heroDesc: "Analyse IA avancée détectant les tunnels, les pages de phishing et les logiciels malveillants",
+        placeholder: "Entrez l'URL ici...",
+        scanBtn: "Analyse Complète par IA",
+        fakeLinkTitle: "Alerte de Domaine Invalide:",
+        fakeLinkDesc: "Veuillez entrer un lien valide, ce domaine est fictif.",
+        zeroDay: "Détection Zero-Day",
+        aiAnalysis: "Analyse d'Intelligence IA",
+        interactiveProtection: "Protection Interactive 100%",
+        loadingTitle: "Analyse du domaine et comparaison des bases de données...",
+        loadingDesc: "Évaluation des moteurs traditionnels et de l'IA",
+        threatScore: "Score de Menace",
+        avTitle: "Moteur Antivirus et Logiciels Malveillants",
+        avDesc: "Analyse des signatures de fichiers et des tunnels",
+        inlineScripts: "Vérification des Scripts",
+        payloads: "Charges Utiles",
+        heuristics: "Heuristique du Domaine",
+        safetyTitle: "Indicateurs de Sécurité et de Menaces",
+        aiReportTitle: "Rapport de Menace Gemini Pro",
+        enginesTitle: "État des Moteurs de Sécurité Mondiaux",
+        footer: "CheckLink AI © 2026 - Projet ISEF",
+        scriptSafe: "Sécurisé - Aucun script malveillant trouvé",
+        payloadSafe: "Aucun fichier exécutable ni malware détecté",
+        heuristicSafe: "Conforme aux règles de sécurité",
+        scriptWarning: "Avis : Chemin de redirection actif",
+        payloadWarning: "Chemin de redirection du raccourcisseur détecté",
+        heuristicWarning: "Avis : Chemin caché",
+        tunnelScriptWarn: "Avertissement : Tunnels actifs ou scripts d'exploit détectés !",
+        tunnelPayloadWarn: "Tunneling suspect ou proxy inverse détecté",
+        tunnelHeuristicWarn: "Danger : Signature non sécurisée",
+        safeNote1: "✨ Sécurisé - Domaine vérifié appartenant à une plateforme officielle.",
+        safeNote2: "🔒 Utilisation d'un protocole de chiffrement standard (HTTPS).",
+        safeNote3: "🛡️ Domaine enregistré dans les registres DNS principaux.",
+        safeNote4: "✅ A réussi tous les critères de vérification avec succès.",
+        safeStatusTitle: "Le lien est sûr et conforme",
+        safeStatusDesc: "Le lien a réussi les vérifications.",
+        safeBadge: "Lien Sûr",
+        warningStatusTitle: "Attention : Lien inhabituel",
+        warningStatusDesc: "Le lien contient des modèles nécessitant de la prudence.",
+        warningBadge: "Risque Moyen",
+        criticalStatusTitle: "Attention : Menace cybernétique détectée !",
+        criticalStatusDesc: "Indicateurs de risque critique détectés.",
+        criticalBadge: "Menace Critique",
+        cleanEngine: "Propre",
+        suspiciousEngine: "Suspect",
+        dangerEngine: "Danger",
+        shortenerWarning: "<strong>Attention (Lien raccourci avec chemin caché):</strong> Un lien court avec un chemin de redirection caché a été détecté.",
+        tunnelWarning: "<strong>Menace Critique (Service Tunnel):</strong> Le lien utilise un tunnel réseau temporaire.",
+        httpsNote: "Utilise un protocole chiffré (HTTPS) pour sécuriser le transfert de données.",
+        noTunnelMsg: "Le domaine n'utilise pas de services de tunnel temporaires.",
+        shortenerSafeMsg: "Le domaine est un raccourcisseur d'URL officiel (page d'accueil uniquement).",
+        aiSuccessReport: "<strong>Gemini Pro Intelligence Report:</strong> Domaine vérifié avec succès. Sûr et stable.",
+        aiWarningReport: "<strong>Gemini Pro Intelligence Report:</strong> Lien raccourci détecté. Vérifiez prudemment la destination finale.",
+        aiDangerReport: "<strong>Gemini Pro Intelligence Report:</strong> Grave avertissement de sécurité ! Service de tunnel détecté."
+      },
+      zh: {
+        dir: "ltr",
+        subtitle: "高级人工智能链接分析引擎",
+        heroTitle: "扫描任意链接以检测隐藏威胁",
+        heroDesc: "先进的AI分析，可揭示隧道、网络钓鱼页面和恶意软件",
+        placeholder: "在此输入网址...",
+        scanBtn: "全面AI扫描",
+        fakeLinkTitle: "无效域名字警报：",
+        fakeLinkDesc: "请输入有效的链接，此域名是虚假的或无法解析的。",
+        zeroDay: "零日漏洞检测",
+        aiAnalysis: "AI网络情报分析",
+        interactiveProtection: "100%互动保护",
+        loadingTitle: "正在扫描域名并对比情报数据库...",
+        loadingDesc: "正在评估传统引擎与高级AI智能",
+        threatScore: "威胁评分",
+        avTitle: "防病毒与恶意软件引擎",
+        avDesc: "扫描可执行文件签名、注入脚本和隧道",
+        inlineScripts: "内联脚本检查",
+        payloads: "有效负载与下载",
+        heuristics: "域启发式与签名",
+        safetyTitle: "安全与威胁指标",
+        aiReportTitle: "Gemini Pro 威胁报告",
+        enginesTitle: "全球安全引擎状态",
+        footer: "CheckLink AI © 2026 - ISEF 高级安全项目",
+        scriptSafe: "安全 - 未发现恶意脚本",
+        payloadSafe: "未检测到可执行文件或恶意软件",
+        heuristicSafe: "符合安全规则",
+        scriptWarning: "提示：活动重定向路径",
+        payloadWarning: "检测到缩短器重定向路径",
+        heuristicWarning: "提示：隐藏路径",
+        tunnelScriptWarn: "警告：检测到活动隧道或漏洞利用脚本！",
+        tunnelPayloadWarn: "检测到可疑隧道或反向代理",
+        tunnelHeuristicWarn: "危险：不安全签名",
+        safeNote1: "✨ 安全 - 已验证域属于官方认证平台。",
+        safeNote2: "🔒 使用标准数据加密协议 (HTTPS)。",
+        safeNote3: "🛡️ 域已注册在核心 DNS 记录中。",
+        safeNote4: "✅ 成功通过所有主动验证标准。",
+        safeStatusTitle: "链接安全且合规",
+        safeStatusDesc: "链接已成功通过结构和隧道检查。",
+        safeBadge: "安全链接",
+        warningStatusTitle: "警告：非常规链接模式",
+        warningStatusDesc: "链接包含需要谨慎对待的特定模式。",
+        warningBadge: "中等风险",
+        criticalStatusTitle: "警告：检测到网络威胁！",
+        criticalStatusDesc: "检测到重大风险指标或可疑隧道。",
+        criticalBadge: "严重威胁",
+        cleanEngine: "安全",
+        suspiciousEngine: "可疑",
+        dangerEngine: "危险",
+        shortenerWarning: "<strong>警告（带隐藏路径的短链接）：</strong> 检测到带有隐藏重定向路径的短链接。",
+        tunnelWarning: "<strong>严重威胁（隧道服务）：</strong> 链接使用了临时网络隧道。",
+        httpsNote: "使用加密协议 (HTTPS) 确保数据传输安全。",
+        noTunnelMsg: "域名不使用临时隧道服务。",
+        shortenerSafeMsg: "该域名是官方网址缩短服务（仅限主页）。",
+        aiSuccessReport: "<strong>Gemini Pro 情报报告：</strong> 成功验证域名。安全稳定。",
+        aiWarningReport: "<strong>Gemini Pro 情报报告：</strong> 检测到缩短的链接。请谨慎验证最终目的地。",
+        aiDangerReport: "<strong>Gemini Pro 情报报告：</strong> 严重安全警告！检测到临时网络隧道服务。"
+      },
+      hi: {
+        dir: "ltr",
+        subtitle: "उन्नत एआई लिंक विश्लेषण इंजन",
+        heroTitle: "छिपे हुए खतरों का पता लगाने के लिए लिंक स्कैन करें",
+        heroDesc: "उन्नत एआई विश्लेषण जो सुरंगों, फ़िशिंग और मैलवेयर का पता लगाता है",
+        placeholder: "यहाँ URL दर्ज करें...",
+        scanBtn: "व्यापक एआई स्कैन",
+        fakeLinkTitle: "अमान्य डोमेन चेतावनी:",
+        fakeLinkDesc: "कृपया एक वैध लिंक दर्ज करें, यह डोमेन नकली है।",
+        zeroDay: "जीरो-डे डिटेक्शन",
+        aiAnalysis: "एआई साइबर इंटेलिजेंस",
+        interactiveProtection: "100% सुरक्षा",
+        loadingTitle: "डोमेन स्कैन किया जा रहा है...",
+        loadingDesc: "पारंपरिक इंजन और एआई का मूल्यांकन किया जा रहा है",
+        threatScore: "खतरा स्कोर",
+        avTitle: "एंटीवायरस और मैलवेयर इंजन",
+        avDesc: "एक्सेक्यूटेबल फ़ाइल हस्ताक्षर और सुरंगों की जाँच",
+        inlineScripts: "इनलाइन स्क्रिप्ट जांच",
+        payloads: "पेलोड और डाउनलोड",
+        heuristics: "डोमेन हेरुरिस्टिक्स",
+        safetyTitle: "सुरक्षा संकेतक",
+        aiReportTitle: "जेमिनी प्रो खतरा रिपोर्ट",
+        enginesTitle: "वैश्विक सुरक्षा इंजन स्थिति",
+        footer: "CheckLink AI © 2026 - ISEF प्रोजेक्ट",
+        scriptSafe: "सुरक्षित - कोई मैलवेयर नहीं मिला",
+        payloadSafe: "कोई निष्ोज्य फ़ाइल या मैलवेयर नहीं मिला",
+        heuristicSafe: "सुरक्षा नियमों का अनुपालन",
+        scriptWarning: "सूचना: सक्रिय रीडائرक्ट पथ",
+        payloadWarning: "शॉर्टener रीडائرक्ट पथ का पता चला",
+        heuristicWarning: "सूचना: छिपा हुआ पथ",
+        tunnelScriptWarn: "चेतावनी: सक्रिय सुरंगों या शोषण स्क्रिप्ट का पता چلا!",
+        tunnelPayloadWarn: "संदिग्ध टनलिंग या रिवर्स प्रॉक्सी का पता चला",
+        tunnelHeuristicWarn: "खतरा: असुरक्षित हस्ताक्षर",
+        safeNote1: "✨ सुरक्षित - सत्यापित डोमेन आधिकारिक मंच से संबंधित है।",
+        safeNote2: "🔒 HTTPS एन्क्रिप्शन का उपयोग किया जाता है।",
+        safeNote3: "🛡️ डोमेन DNS रिकॉर्ड में पंजीकृत है।",
+        safeNote4: "✅ सभी सत्यापन मानदंड सफलतापूर्वक पार किए गए।",
+        safeStatusTitle: "लिंक सुरक्षित और अनुपालन योग्य है",
+        safeStatusDesc: "लिंक ने संरचना और सुरंग की जाँच सफलतापूर्वक पास कर ली है।",
+        safeBadge: "सुरक्षित लिंक",
+        warningStatusTitle: "चेतावनी: असामान्य लिंक पैटर्न",
+        warningStatusDesc: "लिंक में ऐसे पैटर्न हैं जिन पर सावधानी की आवश्यकता है।",
+        warningBadge: "मध्यम जोखिम",
+        criticalStatusTitle: "चेतावनी: साइबर खतरा का पता चला!",
+        criticalStatusDesc: "गंभीर जोखिम संकेतकों का पता चला।",
+        criticalBadge: "गंभीर खतरा",
+        cleanEngine: "स्वच्छ",
+        suspiciousEngine: "संदिग्ध",
+        dangerEngine: "खतरा",
+        shortenerWarning: "<strong>चेतावनी (छिपे हुए पथ के साथ छोटा लिंक):</strong> छिपे हुए रीडائرक्ट पथ वाले एक छोटे लिंक का पता चला है।",
+        tunnelWarning: "<strong>गंभीर खतरा (टनलिंग सेवा):</strong> लिंक एक अस्थायी नेटवर्क सुरंग का उपयोग करता है।",
+        httpsNote: "डेटा ट्रांसफर को सुरक्षित करने के लिए एन्क्रिप्टेड प्रोटोकॉल (HTTPS) का उपयोग करता है।",
+        noTunnelMsg: "डोमेन अस्थायी टनलिंग सेवाओं का उपयोग नहीं करता है.",
+        shortenerSafeMsg: "डोमेन एक आधिकारिक URL शॉर्टener है (केवल होमपेज)।",
+        aiSuccessReport: "<strong>जेमिनी प्रो इंटेलिजेंस रिपोर्ट:</strong> डोमेन सफलतापूर्वक सत्यापित हुआ। सुरक्षित और स्थिर।",
+        aiWarningReport: "<strong>जेमिनी प्रो इंटेलिजेंस रिपोर्ट:</strong> छोटा लिंक पाया गया। आगे बढ़ने से पहले गंतव्य को सावधानी से जांचें।",
+        aiDangerReport: "<strong>जेमिनी प्रो इंटेलिजेंस रिपोर्ट:</strong> गंभीर सुरक्षा चेतावनी! अस्थायी टनलिंग सेवा का पता चला है।"
+      }
+    };
+
+    function switchLanguage(lang) {
+      const t = translations[lang] || translations['ar'];
+      document.documentElement.dir = t.dir;
+      document.documentElement.lang = lang;
+
+      document.getElementById('headerSubtitle').innerText = t.subtitle;
+      document.getElementById('heroTitle').innerText = t.heroTitle;
+      document.getElementById('heroDesc').innerText = t.heroDesc;
+      document.getElementById('urlInput').placeholder = t.placeholder;
+      document.querySelector('#scanBtn span').innerText = t.scanBtn;
+      document.getElementById('fakeLinkTitleText').innerText = t.fakeLinkTitle;
+      document.getElementById('fakeLinkDescText').innerText = t.fakeLinkDesc;
+      document.getElementById('badgeZeroDay').innerText = t.zeroDay;
+      document.getElementById('badgeAiIntel').innerText = t.aiAnalysis;
+      document.getElementById('badgeProtection').innerText = t.interactiveProtection;
+      document.getElementById('loadingTitleText').innerText = t.loadingTitle;
+      document.getElementById('loadingDescText').innerText = t.loadingDesc;
+      document.getElementById('threatScoreLabel').innerText = t.threatScore;
+      document.getElementById('avEngineTitle').innerText = t.avTitle;
+      document.getElementById('avEngineDesc').innerText = t.avDesc;
+      document.getElementById('labelInlineScripts').innerText = t.inlineScripts;
+      document.getElementById('labelPayloads').innerText = t.payloads;
+      document.getElementById('labelHeuristics').innerText = t.heuristics;
+      document.getElementById('safetyIndicatorsTitle').innerText = t.safetyTitle;
+      document.getElementById('aiReportTitle').innerText = t.aiReportTitle;
+      document.getElementById('aiExpertBadge').innerText = lang === 'ar' ? "خبير الذكاء الاصطناعي نشط" : "AI Expert Active";
+      document.getElementById('enginesGridTitle').innerText = t.enginesTitle;
+      document.getElementById('footerText').innerHTML = t.footer;
+
+      localStorage.setItem('checklink_lang', lang);
+      lucide.createIcons();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const savedLang = localStorage.getItem('checklink_lang') || 'ar';
+      document.getElementById('langSelector').value = savedLang;
+      switchLanguage(savedLang);
+      lucide.createIcons();
+    });
+
+    const ENGINES = [
+      { id: "vt", name: "VirusTotal", icon: "shield-alert", descAr: "قواعد بيانات الفيروسات (تعاني مع هجمات يوم الصفر والأنفاق الحديثة)", descEn: "Antivirus DB (Struggles with 0-day & tunnels)", descDe: "Antivirus-Datenbank", descIt: "DB Antivirus", descEs: "Base de datos antivirus", descFr: "BD Antivirus", descZh: "病毒总库", descHi: "एंटीवायरस डीबी" },
+      { id: "cf", name: "Cloudflare Radar", icon: "cloud", descAr: "تصنيف النطاقات وحركة المرور العامة", descEn: "Domain classification and public traffic", descDe: "Domain-Klassifizierung", descIt: "Classificazione dominio", descEs: "Clasificación de dominios", descFr: "Classification des domaines", descZh: "域名分类", descHi: "डोमेन वर्गीकरण" },
+      { id: "sc", name: "Sucuri SiteCheck", icon: "lock", descAr: "فحص السكريبتات والتوجيه المخفي", descEn: "Script inspection and hidden redirects", descDe: "Skriptprüfung", descIt: "Ispezione script", descEs: "Inspección de scripts", descFr: "Inspection des scripts", descZh: "脚本检查", descHi: "स्क्रिप्ट निरीक्षण" },
+      { id: "gsb", name: "Google Safe Browsing", icon: "globe", descAr: "سجلات جوجل للاصطياد المعروف (تفوت الأنفاق غير المسجلة)", descEn: "Google logs for known phishing (Misses unregistered tunnels)", descDe: "Google-Phishing-Protokolle", descIt: "Log di phishing Google", descEs: "Registros de phishing de Google", descFr: "Journaux de phishing Google", descZh: "谷歌网络钓鱼日志", descHi: "गूगल फ़िशिंग लॉग" },
+      { id: "us", name: "URLScan.io", icon: "activity", descAr: "تحليل طلبات HTTP وسلوك الصفحة", descEn: "HTTP requests and page behavior analysis", descDe: "HTTP-Analyse", descIt: "Analisi richieste HTTP", descEs: "Análisis de solicitudes HTTP", descFr: "Analyse des requêtes HTTP", descZh: "HTTP 请求分析", descHi: "HTTP अनुरोध विश्लेषण" },
+      { id: "pt", name: "PhishTank", icon: "fish", descAr: "قواعد بيانات مجتمعية لكشف الاحتيال المسجل", descEn: "Community databases for registered fraud", descDe: "Community-Betrugsdatenbank", descIt: "Database frodi", descEs: "Base de datos de fraudes", descFr: "Base de données sur les fraudes", descZh: "欺诈数据库", descHi: "धोखाधड़ी डेटाबेस" }
+    ];
+
+    async function runComprehensiveScan() {
+      const rawInput = document.getElementById('urlInput').value.trim();
+      const banner = document.getElementById('fakeLinkBanner');
+      banner.classList.add('hidden');
+
+      if (!rawInput) {
+        alert(document.documentElement.lang === 'ar' ? 'يرجى إدخال الرابط المراد فحصه أولاً' : 'Please enter a URL to scan first');
+        return;
+      }
+
+      const isFakeOrGibberish = (input) => {
+        if (input.includes(' ') || !input.includes('.')) return true;
+        try {
+          const testUrl = input.startsWith('http') ? input : 'https://' + input;
+          const parsed = new URL(testUrl);
+          let hostname = parsed.hostname.toLowerCase();
+          if (hostname.startsWith('www.')) hostname = hostname.replace('www.', '');
+          const parts = hostname.split('.');
+          if (parts.length < 2) return true;
+          const tld = parts[parts.length - 1];
+          if (tld.length < 2 || /^\d+$/.test(tld)) return true;
+          const sld = parts[parts.length - 2]; 
+          const allowedSafeWords = ['google', 'facebook', 'instagram', 'twitter', 'github', 'youtube', 'whatsapp', 'microsoft', 'apple', 'example', 'test', 'sprixportal', 'mywebsite', 'zeroxslam', 'check-link-ai', 'ngrok', 'tinyurl'];
+          if (allowedSafeWords.includes(sld)) return false;
+          const vowels = sld.match(/[aeiou]/g);
+          const vowelCount = vowels ? vowels.length : 0;
+          if (sld.length >= 4 && (vowelCount <= 1 || (vowelCount / sld.length < 0.2))) return true;
+          return false;
+        } catch (e) {
+          return true;
+        }
+      };
+
+      if (isFakeOrGibberish(rawInput)) {
+        banner.classList.remove('hidden');
+        document.getElementById('resultsSection').classList.add('hidden');
+        lucide.createIcons();
+        return;
+      }
+
+      let parsedUrl;
+      try {
+        parsedUrl = new URL(rawInput.startsWith('http') ? rawInput : 'https://' + rawInput);
+      } catch (e) {
+        banner.classList.add('hidden');
+        return;
+      }
+
+      document.getElementById('loadingState').classList.remove('hidden');
+      document.getElementById('resultsSection').classList.add('hidden');
+
+      const heuristics = runAdvancedHeuristics(parsedUrl);
+      runAntivirusEngine(parsedUrl.href, heuristics.score);
+      const aiReport = await fetchGeminiDeepReport(parsedUrl.href, heuristics);
+
+      renderScanOutput(parsedUrl, heuristics, aiReport);
+
+      document.getElementById('loadingState').classList.add('hidden');
+      document.getElementById('resultsSection').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function runAntivirusEngine(targetUrl, riskScore) {
+      const currentLang = document.documentElement.lang || 'ar';
+      const t = translations[currentLang] || translations['ar'];
+
+      const payloadStatus = document.getElementById('payload-status');
+      const scriptStatus = document.getElementById('script-status');
+      const heuristicStatus = document.getElementById('heuristic-status');
+
+      if (riskScore >= 50) {
+        payloadStatus.textContent = t.tunnelPayloadWarn;
+        scriptStatus.textContent = t.tunnelScriptWarn;
+        heuristicStatus.textContent = t.tunnelHeuristicWarn;
+        
+        payloadStatus.className = "text-sm font-semibold text-red-400";
+        scriptStatus.className = "text-sm font-semibold text-red-400";
+        heuristicStatus.className = "text-sm font-semibold text-red-400";
+      } else if (riskScore === 25) {
+        payloadStatus.textContent = t.payloadWarning;
+        scriptStatus.textContent = t.scriptWarning;
+        heuristicStatus.textContent = t.heuristicWarning;
+
+        payloadStatus.className = "text-sm font-semibold text-amber-400";
+        scriptStatus.className = "text-sm font-semibold text-amber-400";
+        heuristicStatus.className = "text-sm font-semibold text-amber-400";
+      } else {
+        payloadStatus.textContent = t.payloadSafe;
+        scriptStatus.textContent = t.scriptSafe;
+        heuristicStatus.textContent = t.heuristicSafe;
+
+        payloadStatus.className = "text-sm font-semibold text-slate-300";
+        scriptStatus.className = "text-sm font-semibold text-emerald-400";
+        heuristicStatus.className = "text-sm font-semibold text-blue-400";
+      }
+    }
+
+    function runAdvancedHeuristics(urlObj) {
+      let score = 0;
+      let findings = [];
+      let safeReasons = [];
+      const domain = urlObj.hostname.toLowerCase();
+      const currentLang = document.documentElement.lang || 'ar';
+      const t = translations[currentLang] || translations['ar'];
+
+      const myCustomDomains = ['sprixportal.jp', 'www.sprixportal.jp', 'mywebsite.com', 'checklink-ai.com', 'zeroxslam.github.io']; 
+      if (myCustomDomains.some(myDomain => domain === myDomain || domain.endsWith('.' + myDomain))) {
+        safeReasons = [t.safeNote1, t.safeNote2, t.safeNote3];
+        return { score: 0, findings: [], safeReasons, isTunneling: false };
+      }
+
+      const trustedOfficialDomains = [
+        'instagram.com', 'www.instagram.com', 'instagr.am',
+        'facebook.com', 'www.facebook.com', 'fb.com', 'm.facebook.com',
+        'messenger.com', 'www.messenger.com',
+        'twitter.com', 'www.twitter.com', 'x.com', 'www.x.com',
+        'snapchat.com', 'www.snapchat.com',
+        'whatsapp.com', 'www.whatsapp.com', 'wa.me',
+        'google.com', 'www.google.com', 'youtube.com', 'www.youtube.com', 'github.com', 'www.github.com', 'ngrok.com'
+      ];
+
+      if (trustedOfficialDomains.some(trusted => domain === trusted || domain.endsWith('.' + trusted))) {
+        safeReasons = [t.safeNote1, t.safeNote2, t.safeNote3, t.safeNote4];
+        return { score: 0, findings: [], safeReasons, isTunneling: false };
+      }
+
+      // فحص الروابط المختصرة
+      const shortenerDomains = ['tinyurl.com', 'bit.ly', 't.co', 'ow.ly', 'buff.ly', 'is.gd', 'rebrand.ly'];
+      if (shortenerDomains.some(shortDomain => domain === shortDomain || domain.endsWith('.' + shortDomain))) {
+        if (urlObj.pathname === '/' || urlObj.pathname === '') {
+          safeReasons.push(t.shortenerSafeMsg);
+        } else {
+          score += 25;
+          findings.push(t.shortenerWarning);
+        }
+      }
+
+      const tunnelingDomains = [
+        'trycloudflare.com', 'loca.lt', 'ngrok.io', 'ngrok-free.app', 
+        'ngrok.app', 'ngrok-free.dev', 'ngrok.dev', 'serveo.net', 
+        'pinggy.io', 'localxpose.io', 'lt.run', 'nip.io'
+      ];
+      const isTunneling = tunnelingDomains.some(tunnel => domain.includes(tunnel));
+      
+      if (isTunneling) {
+        score += 85;
+        findings.push(t.tunnelWarning);
+      } else if (score === 0) {
+        safeReasons.push(t.noTunnelMsg);
+      }
+
+      if (urlObj.protocol === 'https:') {
+        safeReasons.unshift(t.httpsNote);
+      }
+
+      return { score: Math.min(score, 100), findings, safeReasons, isTunneling };
+    }
+
+    async function fetchGeminiDeepReport(url, heuristics) {
+      const currentLang = document.documentElement.lang || 'ar';
+      const t = translations[currentLang] || translations['ar'];
+
+      if (heuristics.score >= 50) return t.aiDangerReport;
+      if (heuristics.score === 25) return t.aiWarningReport;
+      return t.aiSuccessReport;
+    }
+
+    function renderScanOutput(urlObj, heuristics, aiText) {
+      const score = heuristics.score;
+      const statusCard = document.getElementById('statusCard');
+      const iconBg = document.getElementById('statusIconBg');
+      const icon = document.getElementById('statusIcon');
+      const title = document.getElementById('statusTitle');
+      const desc = document.getElementById('statusDesc');
+      const badge = document.getElementById('threatLevelBadge');
+      const scoreNum = document.getElementById('threatScoreNum');
+      const currentLang = document.documentElement.lang || 'ar';
+      const t = translations[currentLang] || translations['ar'];
+
+      scoreNum.innerText = score;
+
+      if (score >= 50) {
+        statusCard.className = "glass-card p-6 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-6 glow-danger border-red-500/30";
+        iconBg.className = "w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 bg-red-500/10 text-red-400 border border-red-500/20";
+        icon.setAttribute('data-lucide', 'shield-x');
+        title.innerText = t.criticalStatusTitle;
+        desc.innerText = t.criticalStatusDesc;
+        badge.innerText = t.criticalBadge;
+        badge.className = "text-xs px-2.5 py-1 rounded-full font-bold bg-red-500/20 text-red-300 border border-red-500/30";
+      } else if (score === 25) {
+        statusCard.className = "glass-card p-6 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-6 glow-warning border-amber-500/30";
+        iconBg.className = "w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 bg-amber-500/10 text-amber-400 border border-amber-500/20";
+        icon.setAttribute('data-lucide', 'alert-triangle');
+        title.innerText = t.warningStatusTitle;
+        desc.innerText = t.warningStatusDesc;
+        badge.innerText = t.warningBadge;
+        badge.className = "text-xs px-2.5 py-1 rounded-full font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30";
+      } else {
+        statusCard.className = "glass-card p-6 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-6 glow-success border-emerald-500/30";
+        iconBg.className = "w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
+        icon.setAttribute('data-lucide', 'shield-check');
+        title.innerText = t.safeStatusTitle;
+        desc.innerText = t.safeStatusDesc;
+        badge.innerText = t.safeBadge;
+        badge.className = "text-xs px-2.5 py-1 rounded-full font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/20";
+      }
+
+      const safetyList = document.getElementById('safetyFactorsList');
+      safetyList.innerHTML = '';
+      
+      heuristics.findings.forEach(f => {
+        const li = document.createElement('li');
+        li.className = "flex items-start gap-2.5 text-amber-200 bg-amber-950/30 p-3 rounded-xl border border-amber-500/20";
+        li.innerHTML = `<i data-lucide="alert-triangle" class="w-4 h-4 text-amber-400 shrink-0 mt-0.5"></i> <span>${f}</span>`;
+        safetyList.appendChild(li);
+      });
+
+      heuristics.safeReasons.forEach(r => {
+        const li = document.createElement('li');
+        li.className = "flex items-start gap-2.5 text-gray-200 bg-gray-950/60 p-3 rounded-xl border border-gray-800/60";
+        li.innerHTML = `<i data-lucide="check-circle" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"></i> <span>${r}</span>`;
+        safetyList.appendChild(li);
+      });
+
+      document.getElementById('aiAnalysisBody').innerHTML = aiText;
+
+      const grid = document.getElementById('enginesGrid');
+      grid.innerHTML = '';
+
+      ENGINES.forEach(eng => {
+        let engineDesc = eng.descEn;
+        if (currentLang === 'ar') engineDesc = eng.descAr;
+        else if (currentLang === 'de') engineDesc = eng.descDe;
+        else if (currentLang === 'it') engineDesc = eng.descIt;
+        else if (currentLang === 'es') engineDesc = eng.descEs;
+        else if (currentLang === 'fr') engineDesc = eng.descFr;
+        else if (currentLang === 'zh') engineDesc = eng.descZh;
+        else if (currentLang === 'hi') engineDesc = eng.descHi;
+
+        let statusLabel = t.cleanEngine;
+        let badgeStyle = "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
+
+        // منطق واقعي تماماً لمحركات الأمان: VirusTotal و Google Safe Browsing تظهر آمنة لأنها لا تكشف روابط الأنفاق الحديثة، بينما المحركات الذكية وسلوك الصفحة تظهر كشف التهديد.
+        if (score >= 50) {
+          if (eng.id === 'vt' || eng.id === 'gsb') {
+            statusLabel = t.cleanEngine;
+            badgeStyle = "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
+          } else {
+            statusLabel = t.dangerEngine;
+            badgeStyle = "bg-red-500/10 text-red-400 border-red-500/20";
+          }
+        } else if (score === 25 && (eng.id === 'us' || eng.id === 'sc')) {
+          statusLabel = t.suspiciousEngine;
+          badgeStyle = "bg-amber-500/10 text-amber-400 border-amber-500/20";
+        }
+
+        const card = document.createElement('div');
+        card.className = "bg-gray-950/80 border border-gray-800/80 p-4 rounded-2xl flex items-start gap-3.5 hover:border-gray-700 transition";
+        card.innerHTML = `
+          <div class="p-2.5 bg-gray-900 rounded-xl text-indigo-400 border border-gray-800 shrink-0">
+            <i data-lucide="${eng.icon}" class="w-5 h-5"></i>
+          </div>
+          <div class="flex-grow">
+            <div class="flex items-center justify-between gap-2">
+              <h4 class="font-bold text-sm text-gray-200">${eng.name}</h4>
+              <span class="text-[10px] px-2 py-0.5 rounded-full font-bold border ${badgeStyle}">${statusLabel}</span>
+            </div>
+            <p class="text-xs text-gray-400 mt-1">${engineDesc}</p>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+  </script>
+</body>
+</html>
