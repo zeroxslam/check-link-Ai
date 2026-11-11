@@ -1,0 +1,3064 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CheckLink AI - فحص واستعلام الروابط بالذكاء الاصطناعي المتقدم</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Lucide Icons & Font -->
+  <script src="https://unpkg.com/lucide@0.454.0/dist/umd/lucide.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Cairo', sans-serif;
+      background-color: #030712;
+      color: #f3f4f6;
+    }
+    .glass-card {
+      background: rgba(17, 24, 39, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-nav {
+      background: rgba(3, 7, 18, 0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .glow-effect { box-shadow: 0 0 30px -5px rgba(99, 102, 241, 0.3); }
+    .glow-danger { box-shadow: 0 0 30px -5px rgba(239, 68, 68, 0.4); }
+    .glow-warning { box-shadow: 0 0 30px -5px rgba(245, 158, 11, 0.4); }
+    .glow-success { box-shadow: 0 0 30px -5px rgba(16, 185, 129, 0.3); }
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 0.85; }
+    }
+    .animate-glow { animation: pulseGlow 3s infinite ease-in-out; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
+
+  <!-- Background Ambient Lights -->
+  <div class="fixed inset-0 pointer-events-none overflow-hidden z-0">
+    <div class="absolute -top-40 -right-40 w-96 h-96 bg-indigo-600/15 rounded-full blur-3xl animate-glow"></div>
+    <div class="absolute top-1/2 -left-40 w-96 h-96 bg-cyan-600/10 rounded-full blur-3xl animate-glow" style="animation-delay: 1.5s;"></div>
+  </div>
+
+  <!-- Header / Navigation -->
+  <header class="sticky top-0 z-50 glass-nav">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col sm:flex-row justify-between items-center gap-4">
+      <div class="flex items-center gap-3">
+        <div class="p-2.5 bg-gradient-to-tr from-indigo-600 to-cyan-500 rounded-xl shadow-lg shadow-indigo-500/20">
+          <i data-lucide="shield-check" class="w-6 h-6 text-white"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-xl font-extrabold bg-gradient-to-r from-indigo-400 via-cyan-300 to-blue-400 bg-clip-text text-transparent">
+              CheckLink AI
+            </h1>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">v3.5 Pro (ISEF Edition)</span>
+          </div>
+          <p id="headerSubtitle" class="text-xs text-gray-400">منظومة تحليل الروابط الذكية المتقدمة</p>
+        </div>
+      </div>
+
+      <!-- Controls (Language Selector + Status Badge) -->
+      <div class="flex items-center gap-3">
+        <div class="relative inline-block text-left">
+          <div class="flex items-center gap-2 bg-gray-950/80 border border-gray-700/80 px-3 py-1.5 rounded-xl text-xs text-gray-200 shadow-inner">
+            <i data-lucide="globe" class="w-4 h-4 text-indigo-400"></i>
+            <select id="langSelector" onchange="switchLanguage(this.value)" class="bg-transparent text-gray-200 focus:outline-none cursor-pointer">
+              <option value="ar" class="bg-gray-900 text-white">العربية</option>
+              <option value="en" class="bg-gray-900 text-white">English</option>
+              <option value="de" class="bg-gray-900 text-white">Deutsch</option>
+              <option value="it" class="bg-gray-900 text-white">Italiano</option>
+              <option value="es" class="bg-gray-900 text-white">Español</option>
+              <option value="fr" class="bg-gray-900 text-white">Français</option>
+              <option value="zh" class="bg-gray-900 text-white">中文</option>
+              <option value="hi" class="bg-gray-900 text-white">हिन्दी</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <span class="text-xs px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-semibold flex items-center gap-1.5">
+            <i data-lucide="cpu" class="w-3.5 h-3.5"></i>
+            Gemini AI Engine Active
+          </span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 py-8 w-full flex-grow">
+
+    <!-- Hero / Input Section -->
+    <div class="glass-card p-6 sm:p-8 rounded-3xl glow-effect mb-8 border border-gray-800">
+      <div class="text-center max-w-2xl mx-auto mb-6">
+        <h2 id="heroTitle" class="text-2xl sm:text-3xl font-black text-white mb-2">افحص أي رابط لاكتشاف التهديدات الخفية</h2>
+        <p id="heroDesc" class="text-sm text-gray-400">تحليل ذكي متقدم يكشف روابط الأنفاق (Tunnels)، صفحات الاصطياد، والبرمجيات الخبيثة مع مقارنة أدق لمحركات الأمان</p>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-3">
+        <div class="relative flex-grow">
+          <input type="text" id="urlInput" placeholder="أدخل الرابط هنا (مثال: https://tinyurl.com/lecturee)"
+                 class="w-full bg-gray-950/80 border border-gray-700/80 pr-11 pl-4 py-3.5 rounded-2xl text-gray-100 placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition text-sm shadow-inner">
+          <i data-lucide="link-2" class="w-5 h-5 text-gray-400 absolute right-4 top-1/2 -translate-y-1/2"></i>
+        </div>
+        <button onclick="runComprehensiveScan()" id="scanBtn" class="bg-gradient-to-r from-indigo-600 via-blue-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white font-bold px-8 py-3.5 rounded-2xl shadow-xl shadow-indigo-600/25 transition-all flex items-center justify-center gap-2 shrink-0">
+          <i data-lucide="shield-alert" class="w-5 h-5"></i>
+          <span>فحص ذكي شامل</span>
+        </button>
+      </div>
+
+      <!-- Error / Warning Banner for Fake Links -->
+      <div id="fakeLinkBanner" class="hidden mt-4 p-4 rounded-2xl bg-red-500/10 border border-red-500/30 text-red-300 text-sm flex items-center gap-3">
+        <i data-lucide="alert-octagon" class="w-6 h-6 text-red-400 shrink-0"></i>
+        <div>
+          <span id="fakeLinkTitleText" class="font-bold block">تنبيه نطاق غير متاح:</span>
+          <span id="fakeLinkDescText">رجاءً أدخل لينك آخر، هذا اللينك وهمي أو غير حقيقي.</span>
+        </div>
+      </div>
+
+      <!-- Quick Badges -->
+      <div class="flex flex-wrap justify-center gap-4 mt-5 text-xs text-gray-400">
+        <span class="flex items-center gap-1.5"><i data-lucide="zap" class="w-4 h-4 text-amber-400"></i> <span id="badgeZeroDay">كشف ثغرات يوم الصفر</span></span>
+        <span class="flex items-center gap-1.5"><i data-lucide="sparkles" class="w-4 h-4 text-cyan-400"></i> <span id="badgeAiIntel">تحليل استخباري بالذكاء الاصطناعي</span></span>
+        <span class="flex items-center gap-1.5"><i data-lucide="lock" class="w-4 h-4 text-indigo-400"></i> <span id="badgeProtection">حماية تفاعلية 100%</span></span>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loadingState" class="hidden text-center py-16 glass-card rounded-3xl mb-8">
+      <div class="relative inline-block mb-4">
+        <div class="w-16 h-16 border-4 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin"></div>
+        <i data-lucide="brain" class="w-6 h-6 text-indigo-400 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></i>
+      </div>
+      <h3 id="loadingTitleText" class="text-lg font-bold text-gray-200">جاري فحص النطاق ومقارنة قواعد البيانات الاستخباراتية...</h3>
+      <p id="loadingDescText" class="text-xs text-gray-400 mt-1">يتم تقييم المحركات التقليدية واستنطاق الذكاء الاصطناعي المتقدم</p>
+    </div>
+
+    <!-- Results Display -->
+    <div id="resultsSection" class="hidden space-y-6 mb-12">
+
+      <!-- 1. Overall Security Status -->
+      <div id="statusCard" class="glass-card p-6 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="flex items-center gap-5">
+          <div id="statusIconBg" class="w-16 h-16 rounded-2xl flex items-center justify-center shrink-0">
+            <i id="statusIcon" class="w-8 h-8"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-3">
+              <h2 id="statusTitle" class="text-2xl font-black"></h2>
+              <span id="threatLevelBadge" class="text-xs px-2.5 py-1 rounded-full font-bold"></span>
+            </div>
+            <p id="statusDesc" class="text-sm text-gray-300 mt-1"></p>
+          </div>
+        </div>
+
+        <div class="text-center md:text-left bg-gray-950/70 p-4 px-6 rounded-2xl border border-gray-800 shrink-0 w-full md:w-auto">
+          <span id="threatScoreLabel" class="text-xs text-gray-400 block mb-1">مؤشر الخطورة (Threat Score)</span>
+          <div class="flex items-baseline justify-center md:justify-start gap-1">
+            <span id="threatScoreNum" class="text-3xl font-black">0</span>
+            <span id="threatScoreMax" class="text-sm text-gray-500">/ 100</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Antivirus & Malware Engine -->
+      <div id="antivirusContainerCard" class="glass-card p-6 sm:p-7 rounded-3xl border border-red-500/20">
+        <div class="flex items-center gap-3 mb-4">
+          <div id="antivirusHeaderIconBg" class="p-2 bg-red-500/10 text-red-400 rounded-xl border border-red-500/20">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+            </svg>
+          </div>
+          <div>
+            <h3 id="avEngineTitle" class="text-lg font-bold text-white">تحليل مكافحة الفيروسات والبرمجيات الخبيثة (Antivirus & Malware Engine)</h3>
+            <p id="avEngineDesc" class="text-xs text-slate-400">فحص توقيع الملفات التنفيذية، السكريبتات المحقونة، وبرمجيات التروجان والأنفاق</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <div class="bg-gray-950/80 p-3.5 rounded-2xl border border-gray-800">
+            <span id="labelInlineScripts" class="text-xs text-gray-400 block mb-1">فحص السكريبتات (Inline Scripts)</span>
+            <span id="script-status" class="text-sm font-semibold text-emerald-400">آمن - لا توجد أكواد خبيثة</span>
+          </div>
+          <div class="bg-gray-950/80 p-3.5 rounded-2xl border border-gray-800">
+            <span id="labelPayloads" class="text-xs text-gray-400 block mb-1">روابط التحميل والمحتوى (Payloads)</span>
+            <span id="payload-status" class="text-sm font-semibold text-gray-300">لم يتم رصد ملفات تنفيذية</span>
+          </div>
+          <div class="bg-gray-950/80 p-3.5 rounded-2xl border border-gray-800">
+            <span id="labelHeuristics" class="text-xs text-gray-400 block mb-1">توقيع النطاق والسلوك (Heuristics)</span>
+            <span id="heuristic-status" class="text-sm font-semibold text-blue-400">متوافق مع قواعد الأمان</span>
+          </div>
+        </div>
+
+        <div class="pt-4 border-t border-gray-800">
+          <h4 id="safetyIndicatorsTitle" class="text-sm font-bold text-white mb-3">تحليل معايير وأدلة الأمان (Safety & Threat Indicators)</h4>
+          <ul id="safetyFactorsList" class="space-y-2.5 text-sm text-gray-300"></ul>
+        </div>
+      </div>
+
+      <!-- 3. AI Deep Analysis Engine -->
+      <div class="glass-card p-6 sm:p-7 rounded-3xl border border-indigo-500/20">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-3">
+            <div class="p-2 bg-indigo-500/10 rounded-xl text-indigo-400">
+              <i data-lucide="sparkles" class="w-5 h-5"></i>
+            </div>
+            <h3 id="aiReportTitle" class="text-lg font-bold text-white">تقرير التحليل الاستخباري المتقدم (Gemini Pro Threat Report)</h3>
+          </div>
+          <span id="aiExpertBadge" class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">AI Expert Active</span>
+        </div>
+
+        <div id="aiAnalysisBody" class="bg-gray-950/80 p-5 rounded-2xl border border-gray-800/80 text-sm leading-relaxed text-gray-200 whitespace-pre-line font-medium">
+          جاري توليد التقرير الاستخباري...
+        </div>
+      </div>
+
+      <!-- 4. Security Engines Breakdown -->
+      <div>
+        <div class="flex items-center gap-3 mb-4">
+          <div class="p-2 bg-cyan-500/10 rounded-xl text-cyan-400">
+            <i data-lucide="layout-grid" class="w-5 h-5"></i>
+          </div>
+          <h3 id="enginesGridTitle" class="text-lg font-bold text-white">حالة الرابط عبر محركات الأمان العالمية (Static vs AI Engine)</h3>
+        </div>
+
+        <div id="enginesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+      </div>
+
+    </div>
+
+    <!-- 5. Additional Tools Section -->
+    <div id="extraToolsSection" class="hidden space-y-6">
+      <div class="border-t border-gray-800 pt-8 mb-6">
+        <h3 class="text-xl font-extrabold text-white flex items-center gap-2">
+          <i data-lucide="layers" class="w-5 h-5 text-indigo-400"></i>
+          الأدوات الإضافية والتحليلات المتقدمة (Extra Tools & Modules)
+        </h3>
+        <p class="text-xs text-gray-400 mt-1">أدوات إضافية لاختبار الروابط، قراءة الترويسات، وفحص رموز QR وحماية الأمان</p>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="relative z-10 border-t border-gray-800/60 bg-gray-950/60 py-5 text-center text-xs text-gray-500">
+    <p id="footerText">CheckLink AI &copy; 2026 - مشروع أمني متقدم لمعارض العلوم والهندسة (ISEF)</p>
+  </footer>
+
+  <!-- Main JavaScript Engine -->
+  <script>
+    const GEMINI_API_KEY = "AQ.Ab8RN6LZWeibXmAK6JahVhSWdaZWAFDC8ICggpnfQUv7USNJ3A";
+    const translations = {
+      ar: {
+        dir: "rtl",
+        subtitle: "منظومة تحليل الروابط الذكية المتقدمة",
+        heroTitle: "افحص أي رابط لاكتشاف التهديدات الخفية",
+        heroDesc: "تحليل ذكي متقدم يكشف روابط الأنفاق (Tunnels)، صفحات الاصطياد، والبرمجيات الخبيثة مع مقارنة أدق لمحركات الأمان",
+        placeholder: "أدخل الرابط هنا (مثال: https://tinyurl.com/lecturee)",
+        scanBtn: "فحص ذكي شامل",
+        fakeLinkTitle: "تنبيه نطاق غير متاح:",
+        fakeLinkDesc: "رجاءً أدخل لينك آخر، هذا اللينك وهمي أو غير حقيقي.",
+        zeroDay: "كشف ثغرات يوم الصفر",
+        aiAnalysis: "تحليل استخباري بالذكاء الاصطناعي",
+        interactiveProtection: "حماية تفاعلية 100%",
+        loadingTitle: "جاري فحص النطاق ومقارنة قواعد البيانات الاستخباراتية...",
+        loadingDesc: "يتم تقييم المحركات التقليدية واستنطاق الذكاء الاصطناعي المتقدم",
+        threatScore: "مؤشر الخطورة (Threat Score)",
+        avTitle: "تحليل مكافحة الفيروسات والبرمجيات الخبيثة (Antivirus & Malware Engine)",
+        avDesc: "فحص توقيع الملفات التنفيذية، السكريبتات المحقونة، وبرمجيات التروجان والأنفاق",
+        inlineScripts: "فحص السكريبتات (Inline Scripts)",
+        payloads: "روابط التحميل والمحتوى (Payloads)",
+        heuristics: "توقيع النطاق والسلوك (Heuristics)",
+        safetyTitle: "تحليل معايير وأدلة الأمان (Safety & Threat Indicators)",
+        aiReportTitle: "تقرير التحليل الاستخباري المتقدم (Gemini Pro Threat Report)",
+        enginesTitle: "حالة الرابط عبر محركات الأمان العالمية (Static vs AI Engine)",
+        footer: "CheckLink AI © 2026 - مشروع أمني متقدم لمعارض العلوم والهندسة (ISEF)",
+        scriptSafe: "آمن - لا توجد أكواد خبيثة",
+        payloadSafe: "لم يتم رصد ملفات تنفيذية أو برمجيات خبيثة",
+        heuristicSafe: "متوافق مع قواعد الأمان",
+        scriptWarning: "تنبيه: مسار إعادة توجيه نشط",
+        payloadWarning: "رصد مسار فرعي لموقع مختصر",
+        heuristicWarning: "تنبيه: مسار مخفي",
+        tunnelScriptWarn: "تحذير: تم رصد أنفاق اتصال أو أكواد استغلال نشطة!",
+        tunnelPayloadWarn: "رصد روابط أنفاق مشبوهة أو توجيه عكسي",
+        tunnelHeuristicWarn: "خطر: توقيع غير آمن",
+        safeNote1: "✨ أمان - تم التحقق من أن النطاق يتبع منصة رسمية معتمدة عالمياً.",
+        safeNote2: "🔒 استخدام بروتوكول تشفير بيانات قياسي وصحيح (HTTPS).",
+        safeNote3: "🛡️ النطاق مسجل في سجلات نظام أسماء النطاقات (DNS) الأساسية.",
+        safeNote4: "✅ اجتياز كافة معايير التحقق الاستباقي بنجاح تام.",
+        safeStatusTitle: "الرابط آمن ومطابق للمعايير",
+        safeStatusDesc: "اجتاز الرابط فحص الهيكلة والأنفاق بنجاح.",
+        safeBadge: "آمن",
+        warningStatusTitle: "تنبيه: رابط يحمل خصائص غير مألوفة",
+        warningStatusDesc: "الرابط يحتوي على بعض الأنماط (مثل الروابط المختصرة) التي تتطلب الحذر الشديد.",
+        warningBadge: "خطر متوسط",
+        criticalStatusTitle: "تحذير: تهديد سيبراني مكتشف!",
+        criticalStatusDesc: "تم رصد مؤشرات خطورة حرجة أو استخدام لأنفاق توجيه مشبوهة.",
+        criticalBadge: "تهديد حرج",
+        cleanEngine: "نظيف",
+        suspiciousEngine: "مشبوه",
+        dangerEngine: "خطير",
+        shortenerWarning: "<strong>تنبيه (رابط مختصر مع مسار مخفي):</strong> تم رصد استخدام رابط مختصر يحتوي على وجهة فرعية مخفية.",
+        tunnelWarning: "<strong>تهديد حرج مكتشف (Tunneling Service):</strong> الرابط يستخدم خدمة نفق شبكي مؤقت.",
+        httpsNote: "يستخدم بروتوكول مشفر (HTTPS) لتأمين نقل البيانات.",
+        noTunnelMsg: "النطاق لا يستخدم خدمات الأنفاق المؤقتة.",
+        shortenerSafeMsg: "النطاق يتبع خدمة اختصار روابط رسمية (الصفحة الرئيسية فقط).",
+        aiSuccessReport: "<strong>تقرير استخبارات Gemini Pro:</strong> تم التحقق من النطاق بنجاح عبر خوارزميات الاستخبارات السيبرانية. النطاق آمن ومستقر تماماً.",
+        aiWarningReport: "<strong>تقرير استخبارات Gemini Pro:</strong> تم رصد استخدام رابط مختصر أو إعادة توجيه غير مباشرة. يُنصح بالتحقق من الوجهة النهائية بحذر قبل المتابعة.",
+        aiDangerReport: "<strong>تقرير استخبارات Gemini Pro:</strong> تحذير أمني خطير! تم رصد نفق اتصال مؤقت (Tunneling Service)، وهو ما يعجز الفحص التقليدي (مثل VirusTotal) عن رصده بينما كشفه الذكاء الاصطناعي بنجاح."
+      },
+      en: {
+        dir: "ltr",
+        subtitle: "Advanced AI Link Analysis Engine",
+        heroTitle: "Scan Any Link to Detect Hidden Threats",
+        heroDesc: "Advanced AI analysis uncovering tunnels, phishing pages, and malware with precise engine comparisons",
+        placeholder: "Enter URL here (e.g. https://tinyurl.com/lecturee)",
+        scanBtn: "Comprehensive AI Scan",
+        fakeLinkTitle: "Invalid Domain Alert:",
+        fakeLinkDesc: "Please enter a valid link, this domain is fake or unresolvable.",
+        zeroDay: "Zero-Day Exploit Detection",
+        aiAnalysis: "AI Cyber Intelligence Analysis",
+        interactiveProtection: "100% Interactive Protection",
+        loadingTitle: "Scanning domain and comparing intelligence databases...",
+        loadingDesc: "Evaluating traditional engines and advanced AI intelligence",
+        threatScore: "Threat Score",
+        avTitle: "Antivirus & Malware Engine",
+        avDesc: "Scanning executable file signatures, injected scripts, trojans, and tunnels",
+        inlineScripts: "Inline Scripts Check",
+        payloads: "Payloads & Downloads",
+        heuristics: "Domain Heuristics & Signature",
+        safetyTitle: "Safety & Threat Indicators",
+        aiReportTitle: "Gemini Pro Threat Report",
+        enginesTitle: "Global Security Engines Status (Static vs AI Engine)",
+        footer: "CheckLink AI © 2026 - Advanced Security Project for ISEF",
+        scriptSafe: "Secure - No malicious scripts found",
+        payloadSafe: "No executable files or malware detected",
+        heuristicSafe: "Compliant with security rules",
+        scriptWarning: "Notice: Active redirect path",
+        payloadWarning: "Shortener redirect path detected",
+        heuristicWarning: "Notice: Hidden path",
+        tunnelScriptWarn: "Warning: Active tunnels or exploit scripts detected!",
+        tunnelPayloadWarn: "Suspicious tunneling or reverse proxy detected",
+        tunnelHeuristicWarn: "Danger: Unsafe signature",
+        safeNote1: "✨ Secure - Verified domain follows an official globally certified platform.",
+        safeNote2: "🔒 Uses standard and correct data encryption protocol (HTTPS).",
+        safeNote3: "🛡️ Domain is registered in core Domain Name System (DNS) records.",
+        safeNote4: "✅ Passed all proactive verification criteria successfully.",
+        safeStatusTitle: "Link is Safe & Compliant",
+        safeStatusDesc: "Link successfully passed structure and tunnel checks.",
+        safeBadge: "Safe Link",
+        warningStatusTitle: "Warning: Unusual Link Pattern",
+        warningStatusDesc: "The link contains specific patterns (like shorteners with hidden paths) requiring caution.",
+        warningBadge: "Medium Risk",
+        criticalStatusTitle: "Warning: Cyber Threat Detected!",
+        criticalStatusDesc: "Critical risk indicators or suspicious tunnels detected.",
+        criticalBadge: "Critical Threat",
+        cleanEngine: "Clean",
+        suspiciousEngine: "Suspicious",
+        dangerEngine: "Danger",
+        shortenerWarning: "<strong>Warning (Shortened Link with Hidden Path):</strong> Detected a short link with a hidden redirect path.",
+        tunnelWarning: "<strong>Critical Threat (Tunneling Service):</strong> Link uses a temporary network tunnel.",
+        httpsNote: "Uses encrypted protocol (HTTPS) to secure data transfer.",
+        noTunnelMsg: "Domain does not use temporary tunneling services.",
+        shortenerSafeMsg: "Domain is an official URL shortener (Homepage only).",
+        aiSuccessReport: "<strong>Gemini Pro Intelligence Report:</strong> Domain verified successfully through cybersecurity intelligence algorithms. Safe and stable.",
+        aiWarningReport: "<strong>Gemini Pro Intelligence Report:</strong> Shortened link or indirect redirect detected. Verify the final destination cautiously before proceeding.",
+        aiDangerReport: "<strong>Gemini Pro Intelligence Report:</strong> Severe security warning! Temporary tunneling service detected, bypassing static scanners like VirusTotal but caught by AI."
+      },
+      de: {
+        dir: "ltr",
+        subtitle: "Erweiterte KI-Link-Analyse-Engine",
+        heroTitle: "Scannen Sie jeden Link nach versteckten Bedrohungen",
+        heroDesc: "Erweiterte KI-Analyse zur Aufdeckung von Tunneln und Phishing",
+        placeholder: "URL hier eingeben...",
+        scanBtn: "Umfassender KI-Scan",
+        fakeLinkTitle: "Ungültige Domain-Warnung:",
+        fakeLinkDesc: "Bitte geben Sie einen gültigen Link ein.",
+        zeroDay: "Zero-Day-Erkennung",
+        aiAnalysis: "KI-Cyber-Intelligence",
+        interactiveProtection: "100% Schutz",
+        loadingTitle: "Domain wird gescannt...",
+        loadingDesc: "Traditionelle Engines und KI werden ausgewertet",
+        threatScore: "Bedrohungsfaktor",
+        avTitle: "Antivirus & Malware Engine",
+        avDesc: "Überprüfung von Signaturen und Tunneln",
+        inlineScripts: "Inline-Skripte",
+        payloads: "Nutzdaten",
+        heuristics: "Heuristik",
+        safetyTitle: "Sicherheitsindikatoren",
+        aiReportTitle: "Gemini Pro Bedrohungsbericht",
+        enginesTitle: "Globale Sicherheits-Engines",
+        footer: "CheckLink AI © 2026 - ISEF Projekt",
+        scriptSafe: "Sicher - Keine bösartigen Skripte gefunden",
+        payloadSafe: "Keine ausführbaren Dateien oder Malware erkannt",
+        heuristicSafe: "Konform mit Sicherheitsregeln",
+        scriptWarning: "Hinweis: Aktiver Weiterleitungspfad",
+        payloadWarning: "Weiterleitungspfad des Kürzers erkannt",
+        heuristicWarning: "Hinweis: Versteckter Pfad",
+        tunnelScriptWarn: "Warnung: Aktive Tunnel oder Exploits erkannt!",
+        tunnelPayloadWarn: "Verdächtiges Tunneling oder Reverse Proxy erkannt",
+        tunnelHeuristicWarn: "Gefahr: Unsichere Signatur",
+        safeNote1: "✨ Sicher - Verifizierte Domain einer offiziellen Plattform.",
+        safeNote2: "🔒 Verwendung eines Standard-Verschlüsselungsprotokolls (HTTPS).",
+        safeNote3: "🛡️ Domain ist in den DNS-Einträgen registriert.",
+        safeNote4: "✅ Alle Verifizierungskriterien erfolgreich bestanden.",
+        safeStatusTitle: "Link ist sicher und konform",
+        safeStatusDesc: "Link hat Struktur- und Tunnelprüfungen bestanden.",
+        safeBadge: "Sicherer Link",
+        warningStatusTitle: "Warnung: Ungewöhnliches Link-Muster",
+        warningStatusDesc: "Der Link enthält Muster, die Vorsicht erfordern.",
+        warningBadge: "Mittleres Risiko",
+        criticalStatusTitle: "Warnung: Cyber-Bedrohung erkannt!",
+        criticalStatusDesc: "Kritische Risiken oder verdächtige Tunnel erkannt.",
+        criticalBadge: "Kritische Bedrohung",
+        cleanEngine: "Sauber",
+        suspiciousEngine: "Verdächtig",
+        dangerEngine: "Gefahr",
+        shortenerWarning: "<strong>Warnung (Gekürzter Link mit verstecktem Pfad):</strong> Ein kurzer Link mit einem versteckten Weiterleitungspfad wurde erkannt.",
+        tunnelWarning: "<strong>Kritische Bedrohung (Tunneling-Dienst):</strong> Der Link verwendet einen temporären Netzwerk-Tunnel.",
+        httpsNote: "Verwendet ein verschlüsseltes Protokoll (HTTPS) zur sicheren Datenübertragung.",
+        noTunnelMsg: "Domain verwendet keine temporären Tunneldienste.",
+        shortenerSafeMsg: "Domain ist ein offizieller URL-Kürzer (nur Homepage).",
+        aiSuccessReport: "<strong>Gemini Pro Intelligence Report:</strong> Domain erfolgreich verifiziert. Sichere und stabile Verbindung.",
+        aiWarningReport: "<strong>Gemini Pro Intelligence Report:</strong> Gekürzter Link erkannt. Überprüfen Sie das Ziel vorsichtig.",
+        aiDangerReport: "<strong>Gemini Pro Intelligence Report:</strong> Kritischer Sicherheitswarnhinweis! Temporärer Tunnel erkannt."
+      },
+      it: {
+        dir: "ltr",
+        subtitle: "Motore Avanzato di Analisi Link IA",
+        heroTitle: "Scansiona qualsiasi link per minacce nascoste",
+        heroDesc: "Analisi IA avanzata che rileva tunnel e phishing",
+        placeholder: "Inserisci l'URL qui...",
+        scanBtn: "Scansione IA Completa",
+        fakeLinkTitle: "Avviso Dominio Non Valido:",
+        fakeLinkDesc: "Inserisci un link valido, questo dominio è falso.",
+        zeroDay: "Rilevamento Zero-Day",
+        aiAnalysis: "Analisi di Cyber Intelligence",
+        interactiveProtection: "Protezione al 100%",
+        loadingTitle: "Scansione del dominio in corso...",
+        loadingDesc: "Valutazione dei motori tradizionali e dell'IA",
+        threatScore: "Punteggio di Minaccia",
+        avTitle: "Motore Antivirus e Malware",
+        avDesc: "Analisi delle firme dei file e dei tunnel",
+        inlineScripts: "Controllo Script",
+        payloads: "Payload",
+        heuristics: "Euristica",
+        safetyTitle: "Indicatori di Sicurezza",
+        aiReportTitle: "Rapporto sulle Minacce Gemini Pro",
+        enginesTitle: "Stato dei Motori di Sicurezza Globali",
+        footer: "CheckLink AI © 2026 - Progetto ISEF",
+        scriptSafe: "Sicuro - Nessuno script dannoso trovato",
+        payloadSafe: "Nessun file eseguibile o malware rilevato",
+        heuristicSafe: "Conforme alle regole di sicurezza",
+        scriptWarning: "Avviso: Percorso di reindirizzamento attivo",
+        payloadWarning: "Rilevato percorso di reindirizzamento del link corto",
+        heuristicWarning: "Avviso: Percorso nascosto",
+        tunnelScriptWarn: "Attenzione: Rilevati tunnel attivi o script di exploit!",
+        tunnelPayloadWarn: "Rilevato tunneling sospetto o reverse proxy",
+        tunnelHeuristicWarn: "Pericolo: Firma non sicura",
+        safeNote1: "✨ Sicuro - Dominio verificato appartenente a piattaforma ufficiale.",
+        safeNote2: "🔒 Uso del protocollo di crittografia HTTPS.",
+        safeNote3: "🛡️ Dominio registrato nei record DNS principali.",
+        safeNote4: "✅ Superati tutti i criteri di verifica con successo.",
+        safeStatusTitle: "Il link è sicuro e conforme",
+        safeStatusDesc: "Il link ha superato con successo i controlli.",
+        safeBadge: "Link Sicuro",
+        warningStatusTitle: "Attenzione: Pattern di link insolito",
+        warningStatusDesc: "Il link contiene elementi che richiedono cautela.",
+        warningBadge: "Rischio Medio",
+        criticalStatusTitle: "Attenzione: Minaccia informatica rilevata!",
+        criticalStatusDesc: "Rilevati indicatori di rischio critico.",
+        criticalBadge: "Minaccia Critica",
+        cleanEngine: "Pulito",
+        suspiciousEngine: "Sospetto",
+        dangerEngine: "Pericolo",
+        shortenerWarning: "<strong>Avviso (Link abbreviato con percorso nascosto):</strong> Rilevato un link breve con un percorso di reindirizzamento nascosto.",
+        tunnelWarning: "<strong>Minaccia Critica (Servizio Tunneling):</strong> Il link utilizza un tunnel di rete temporaneo.",
+        httpsNote: "Utilizza un protocollo crittografato (HTTPS) per proteggere il trasferimento dei dati.",
+        noTunnelMsg: "Il dominio non utilizza servizi di tunneling temporanei.",
+        shortenerSafeMsg: "Il dominio è un URL shortener ufficiale (solo Home page).",
+        aiSuccessReport: "<strong>Gemini Pro Intelligence Report:</strong> Dominio verificato con successo. Sicuro e stabile.",
+        aiWarningReport: "<strong>Gemini Pro Intelligence Report:</strong> Rilevato link abbreviato. Verificare con cautela la destinazione finale.",
+        aiDangerReport: "<strong>Gemini Pro Intelligence Report:</strong> Grave avviso di sicurezza! Rilevato servizio di tunneling."
+      },
+      es: {
+        dir: "ltr",
+        subtitle: "Motor Avanzado de Análisis de Enlaces con IA",
+        heroTitle: "Analiza cualquier enlace para detectar amenazas ocultas",
+        heroDesc: "Análisis avanzado de IA que detecta túneles, páginas de phishing y malware",
+        placeholder: "Ingrese el enlace aquí...",
+        scanBtn: "Análisis Inteligente Completo",
+        fakeLinkTitle: "Alerta de Dominio No Válido:",
+        fakeLinkDesc: "Por favor ingrese un enlace válido, este dominio es falso.",
+        zeroDay: "Detección de Zero-Day",
+        aiAnalysis: "Análisis de Inteligencia de IA",
+        interactiveProtection: "Protección Interactiva 100%",
+        loadingTitle: "Escaneando dominio y bases de datos...",
+        loadingDesc: "Evaluando motores tradicionales e inteligencia artificial",
+        threatScore: "Puntuación de Amenaza",
+        avTitle: "Motor de Antivirus y Malware",
+        avDesc: "Analizando firmas de archivos ejecutables, scripts y túneles",
+        inlineScripts: "Revisión de Scripts",
+        payloads: "Cargas Útiles y Archivos",
+        heuristics: "Heurística de Dominio",
+        safetyTitle: "Indicadores de Seguridad y Amenazas",
+        aiReportTitle: "Informe de Amenazas Gemini Pro",
+        enginesTitle: "Estado de Motores de Seguridad Globales",
+        footer: "CheckLink AI © 2026 - Proyecto ISEF",
+        scriptSafe: "Seguro - No se encontraron scripts maliciosos",
+        payloadSafe: "No se detectaron archivos ejecutables ni malware",
+        heuristicSafe: "Compatible con las reglas de seguridad",
+        scriptWarning: "Aviso: Ruta de redireccionamiento activa",
+        payloadWarning: "Ruta de redireccionamiento de acortador detectada",
+        heuristicWarning: "Aviso: Ruta oculta",
+        tunnelScriptWarn: "¡Advertencia: Se detectaron túneles activos o scripts de explotación!",
+        tunnelPayloadWarn: "Se detectó túnel sospechoso o proxy inverso",
+        tunnelHeuristicWarn: "Peligro: Firma no segura",
+        safeNote1: "✨ Seguro - Dominio verificado perteneciente a plataforma oficial.",
+        safeNote2: "🔒 Uso de protocolo de cifrado estándar (HTTPS).",
+        safeNote3: "🛡️ Dominio registrado en los registros DNS principales.",
+        safeNote4: "✅ Superó todos los criterios de verificación con éxito.",
+        safeStatusTitle: "El enlace es seguro y cumple con las normas",
+        safeStatusDesc: "El enlace pasó con éxito las comprobaciones.",
+        safeBadge: "Enlace Seguro",
+        warningStatusTitle: "Advertencia: Enlace inusual",
+        warningStatusDesc: "El enlace contiene patrones que requieren precaución.",
+        warningBadge: "Riesgo Medio",
+        criticalStatusTitle: "¡Advertencia: Amenaza cibernética detectada!",
+        criticalStatusDesc: "Se detectaron indicadores de riesgo crítico.",
+        criticalBadge: "Amenaza Crítica",
+        cleanEngine: "Limpio",
+        suspiciousEngine: "Sospechoso",
+        dangerEngine: "Peligro",
+        shortenerWarning: "<strong>Advertencia (Enlace acortado con ruta oculta):</strong> Se detectó un enlace corto con una ruta de redireccionamiento oculta.",
+        tunnelWarning: "<strong>Amenaza Crítica (Servicio de Túnel):</strong> El enlace utiliza un túnel de red temporal.",
+        httpsNote: "Utiliza protocolo cifrado (HTTPS) para asegurar la transferencia de datos.",
+        noTunnelMsg: "El dominio no utiliza servicios de túneles temporales.",
+        shortenerSafeMsg: "El dominio es un acortador de URL oficial (solo página principal).",
+        aiSuccessReport: "<strong>Gemini Pro Intelligence Report:</strong> Dominio verificado exitosamente. Seguro y estable.",
+        aiWarningReport: "<strong>Gemini Pro Intelligence Report:</strong> Se detectó un enlace acortado. Verifique el destino final con precaución antes de continuar.",
+        aiDangerReport: "<strong>Gemini Pro Intelligence Report:</strong> ¡Grave advertencia de seguridad! Servicio de túnel detectado."
+      },
+      fr: {
+        dir: "ltr",
+        subtitle: "Moteur d'Analyse de Liens IA Avancé",
+        heroTitle: "Analysez n'importe quel lien pour détecter les menaces cachées",
+        heroDesc: "Analyse IA avancée détectant les tunnels, les pages de phishing et les logiciels malveillants",
+        placeholder: "Entrez l'URL ici...",
+        scanBtn: "Analyse Complète par IA",
+        fakeLinkTitle: "Alerte de Domaine Invalide:",
+        fakeLinkDesc: "Veuillez entrer un lien valide, ce domaine est fictif.",
+        zeroDay: "Détection Zero-Day",
+        aiAnalysis: "Analyse d'Intelligence IA",
+        interactiveProtection: "Protection Interactive 100%",
+        loadingTitle: "Analyse du domaine et comparaison des bases de données...",
+        loadingDesc: "Évaluation des moteurs traditionnels et de l'IA",
+        threatScore: "Score de Menace",
+        avTitle: "Moteur Antivirus et Logiciels Malveillants",
+        avDesc: "Analyse des signatures de fichiers et des tunnels",
+        inlineScripts: "Vérification des Scripts",
+        payloads: "Charges Utiles",
+        heuristics: "Heuristique du Domaine",
+        safetyTitle: "Indicateurs de Sécurité et de Menaces",
+        aiReportTitle: "Rapport de Menace Gemini Pro",
+        enginesTitle: "État des Moteurs de Sécurité Mondiaux",
+        footer: "CheckLink AI © 2026 - Projet ISEF",
+        scriptSafe: "Sécurisé - Aucun script malveillant trouvé",
+        payloadSafe: "Aucun fichier exécutable ni malware détecté",
+        heuristicSafe: "Conforme aux règles de sécurité",
+        scriptWarning: "Avis : Chemin de redirection actif",
+        payloadWarning: "Chemin de redirection du raccourcisseur détecté",
+        heuristicWarning: "Avis : Chemin caché",
+        tunnelScriptWarn: "Avertissement : Tunnels actifs ou scripts d'exploit détectés !",
+        tunnelPayloadWarn: "Tunneling suspect ou proxy inverse détecté",
+        tunnelHeuristicWarn: "Danger : Signature non sécurisée",
+        safeNote1: "✨ Sécurisé - Domaine vérifié appartenant à une plateforme officielle.",
+        safeNote2: "🔒 Utilisation d'un protocole de chiffrement standard (HTTPS).",
+        safeNote3: "🛡️ Domaine enregistré dans les registres DNS principaux.",
+        safeNote4: "✅ A réussi tous les critères de vérification avec succès.",
+        safeStatusTitle: "Le lien est sûr et conforme",
+        safeStatusDesc: "Le lien a réussi les vérifications.",
+        safeBadge: "Lien Sûr",
+        warningStatusTitle: "Attention : Lien inhabituel",
+        warningStatusDesc: "Le lien contient des modèles nécessitant de la prudence.",
+        warningBadge: "Risque Moyen",
+        criticalStatusTitle: "Attention : Menace cybernétique détectée !",
+        criticalStatusDesc: "Indicateurs de risque critique détectés.",
+        criticalBadge: "Menace Critique",
+        cleanEngine: "Propre",
+        suspiciousEngine: "Suspect",
+        dangerEngine: "Danger",
+        shortenerWarning: "<strong>Attention (Lien raccourci avec chemin caché):</strong> Un lien court avec un chemin de redirection caché a été détecté.",
+        tunnelWarning: "<strong>Menace Critique (Service Tunnel):</strong> Le lien utilise un tunnel réseau temporaire.",
+        httpsNote: "Utilise un protocole chiffré (HTTPS) pour sécuriser le transfert de données.",
+        noTunnelMsg: "Le domaine n'utilise pas de services de tunnel temporaires.",
+        shortenerSafeMsg: "Le domaine est un raccourcisseur d'URL officiel (page d'accueil uniquement).",
+        aiSuccessReport: "<strong>Gemini Pro Intelligence Report:</strong> Domaine vérifié avec succès. Sûr et stable.",
+        aiWarningReport: "<strong>Gemini Pro Intelligence Report:</strong> Lien raccourci détecté. Vérifiez prudemment la destination finale.",
+        aiDangerReport: "<strong>Gemini Pro Intelligence Report:</strong> Grave avertissement de sécurité ! Service de tunnel détecté."
+      },
+      zh: {
+        dir: "ltr",
+        subtitle: "高级人工智能链接分析引擎",
+        heroTitle: "扫描任意链接以检测隐藏威胁",
+        heroDesc: "先进的AI分析，可揭示隧道、网络钓鱼页面和恶意软件",
+        placeholder: "在此输入网址...",
+        scanBtn: "全面AI扫描",
+        fakeLinkTitle: "无效域名警报：",
+        fakeLinkDesc: "请输入有效的链接，此域名是虚假的或无法解析的。",
+        zeroDay: "零日漏洞检测",
+        aiAnalysis: "AI网络情报分析",
+        interactiveProtection: "100%互动保护",
+        loadingTitle: "正在扫描域名并对比情报数据库...",
+        loadingDesc: "正在评估传统引擎与高级AI智能",
+        threatScore: "威胁评分",
+        avTitle: "防病毒与恶意软件引擎",
+        avDesc: "扫描可执行文件签名、注入脚本和隧道",
+        inlineScripts: "内联脚本检查",
+        payloads: "有效负载与下载",
+        heuristics: "域启发式与签名",
+        safetyTitle: "安全与威胁指标",
+        aiReportTitle: "Gemini Pro 威胁报告",
+        enginesTitle: "全球安全引擎状态",
+        footer: "CheckLink AI © 2026 - ISEF 高级安全项目",
+        scriptSafe: "安全 - 未发现恶意脚本",
+        payloadSafe: "未检测到可执行文件或恶意软件",
+        heuristicSafe: "符合安全规则",
+        scriptWarning: "提示：活动重定向路径",
+        payloadWarning: "检测到缩短器重定向路径",
+        heuristicWarning: "提示：隐藏路径",
+        tunnelScriptWarn: "警告：检测到活动隧道或漏洞利用脚本！",
+        tunnelPayloadWarn: "检测到可疑隧道或反向代理",
+        tunnelHeuristicWarn: "危险：不安全签名",
+        safeNote1: "✨ 安全 - 已验证域属于官方认证平台。",
+        safeNote2: "🔒 使用标准数据加密协议 (HTTPS)。",
+        safeNote3: "🛡️ 域已注册在核心 DNS 记录中。",
+        safeNote4: "✅ 成功通过所有主动验证标准。",
+        safeStatusTitle: "链接安全且合规",
+        safeStatusDesc: "链接已成功通过结构和隧道检查。",
+        safeBadge: "安全链接",
+        warningStatusTitle: "警告：非常规链接模式",
+        warningStatusDesc: "链接包含需要谨慎对待的特定模式。",
+        warningBadge: "中等风险",
+        criticalStatusTitle: "警告：检测到网络威胁！",
+        criticalStatusDesc: "检测到重大风险指标或可疑隧道。",
+        criticalBadge: "严重威胁",
+        cleanEngine: "安全",
+        suspiciousEngine: "可疑",
+        dangerEngine: "危险",
+        shortenerWarning: "<strong>警告（带隐藏路径的短链接）：</strong> 检测到带有隐藏重定向路径的短链接。",
+        tunnelWarning: "<strong>严重威胁（隧道服务）：</strong> 链接使用了临时网络隧道。",
+        httpsNote: "使用加密协议 (HTTPS) 确保数据传输安全。",
+        noTunnelMsg: "域名不使用临时隧道服务。",
+        shortenerSafeMsg: "该域名是官方网址缩短服务（仅限主页）。",
+        aiSuccessReport: "<strong>Gemini Pro 情报报告：</strong> 成功验证域名。安全稳定。",
+        aiWarningReport: "<strong>Gemini Pro 情报报告：</strong> 检测到缩短的链接。请谨慎验证最终目的地。",
+        aiDangerReport: "<strong>Gemini Pro 情报报告：</strong> 严重安全警告！检测到临时网络隧道服务。"
+      },
+      hi: {
+        dir: "ltr",
+        subtitle: "उन्नत एआई लिंक विश्लेषण इंजन",
+        heroTitle: "छिपे हुए खतरों का पता लगाने के लिए लिंक स्कैन करें",
+        heroDesc: "उन्नत एआई विश्लेषण जो सुरंगों, फ़िशिंग और मैलवेयर का पता लगाता है",
+        placeholder: "यहाँ URL दर्ज करें...",
+        scanBtn: "व्यापक एआई स्कैन",
+        fakeLinkTitle: "अमान्य डोमेन चेतावनी:",
+        fakeLinkDesc: "कृपया एक वैध लिंक दर्ज करें, यह डोमेन नकली है।",
+        zeroDay: "जीरो-डे डिटेक्शन",
+        aiAnalysis: "एआई साइबर इंटेलिजेंस",
+        interactiveProtection: "100% सुरक्षा",
+        loadingTitle: "डोमेन स्कैन किया जा रहा है...",
+        loadingDesc: "पारंपरिक इंजन और एआई का मूल्यांकन किया जा रहा है",
+        threatScore: "खतरा स्कोर",
+        avTitle: "एंटीवायरस और मैलवेयर इंजन",
+        avDesc: "एक्सेक्यूटेबल फ़ाइल हस्ताक्षर और सुरंगों की जाँच",
+        inlineScripts: "इनलाइन स्क्रिप्ट जांच",
+        payloads: "पेलोड और डाउनलोड",
+        heuristics: "डोमेन ह्यूरिस्टिक्स",
+        safetyTitle: "सुरक्षा संकेतक",
+        aiReportTitle: "जेमिनी प्रो खतरा रिपोर्ट",
+        enginesTitle: "वैश्विक सुरक्षा इंजन स्थिति",
+        footer: "CheckLink AI © 2026 - ISEF प्रोजेक्ट",
+        scriptSafe: "सुरक्षित - कोई मैलवेयर नहीं मिला",
+        payloadSafe: "कोई निष्पादन योग्य फ़ाइल या मैलवेयर नहीं मिला",
+        heuristicSafe: "सुरक्षा नियमों का अनुपालन",
+        scriptWarning: "सूचना: सक्रिय रीडायरेक्ट पथ",
+        payloadWarning: "शॉर्टनर रीडायरेक्ट पथ का पता चला",
+        heuristicWarning: "सूचना: छिपा हुआ पथ",
+        tunnelScriptWarn: "चेतावनी: सक्रिय सुरंगों या शोषण स्क्रिप्ट का पता चला!",
+        tunnelPayloadWarn: "संदिग्ध टनलिंग या रिवर्स प्रॉक्सी का पता चला",
+        tunnelHeuristicWarn: "खतरा: असुरक्षित हस्ताक्षर",
+        safeNote1: "✨ सुरक्षित - सत्यापित डोमेन आधिकारिक मंच से संबंधित है।",
+        safeNote2: "🔒 HTTPS एन्क्रिप्शन का उपयोग किया जाता है।",
+        safeNote3: "🛡️ डोमेन DNS रिकॉर्ड में पंजीकृत है।",
+        safeNote4: "✅ सभी सत्यापन मानदंड सफलतापूर्वक पार किए गए।",
+        safeStatusTitle: "लिंक सुरक्षित और अनुपालन योग्य है",
+        safeStatusDesc: "लिंक ने संरचना और सुरंग की जाँच सफलतापूर्वक पास कर ली है।",
+        safeBadge: "सुरक्षित लिंक",
+        warningStatusTitle: "चेतावनी: असामान्य लिंक पैटर्न",
+        warningStatusDesc: "लिंक में ऐसे पैटर्न हैं जिन पर सावधानी की आवश्यकता है।",
+        warningBadge: "मध्यम जोखिम",
+        criticalStatusTitle: "चेतावनी: साइबर खतरा का पता चला!",
+        criticalStatusDesc: "गंभीर जोखिम संकेतकों का पता चला।",
+        criticalBadge: "गंभीर खतरा",
+        cleanEngine: "स्वच्छ",
+        suspiciousEngine: "संदिग्ध",
+        dangerEngine: "खतरा",
+        shortenerWarning: "<strong>चेतावनी (छिपे हुए पथ के साथ छोटा लिंक):</strong> छिपे हुए रीडायरेक्ट पथ वाले एक छोटे लिंक का पता चला है।",
+        tunnelWarning: "<strong>गंभीर खतरा (टनलिंग सेवा):</strong> लिंक एक अस्थायी नेटवर्क सुरंग का उपयोग करता है।",
+        httpsNote: "डेटा ट्रांसफर को सुरक्षित करने के लिए एन्क्रिप्टेड प्रोटोकॉल (HTTPS) का उपयोग करता है।",
+        noTunnelMsg: "डोमेन अस्थायी टनलिंग सेवाओं का उपयोग नहीं करता है।",
+        shortenerSafeMsg: "डोमेन एक आधिकारिक URL शॉर्टनर है (केवल होमपेज)।",
+        aiSuccessReport: "<strong>जेमिनी प्रो इंटेलिजेंस रिपोर्ट:</strong> डोमेन सफलतापूर्वक सत्यापित हुआ। सुरक्षित और स्थिर।",
+        aiWarningReport: "<strong>जेमिनी प्रो इंटेलिजेंस रिपोर्ट:</strong> छोटा लिंक पाया गया। आगे बढ़ने से पहले गंतव्य को सावधानी से जांचें।",
+        aiDangerReport: "<strong>जेमिनी प्रो इंटेलिजेंस रिपोर्ट:</strong> गंभीर सुरक्षा चेतावनी! अस्थायी टनलिंग सेवा का पता चला है।"
+      }
+    };
+
+    function switchLanguage(lang) {
+      const t = translations[lang] || translations['ar'];
+      document.documentElement.dir = t.dir;
+      document.documentElement.lang = lang;
+
+      document.getElementById('headerSubtitle').innerText = t.subtitle;
+      document.getElementById('heroTitle').innerText = t.heroTitle;
+      document.getElementById('heroDesc').innerText = t.heroDesc;
+      document.getElementById('urlInput').placeholder = t.placeholder;
+      document.querySelector('#scanBtn span').innerText = t.scanBtn;
+      document.getElementById('fakeLinkTitleText').innerText = t.fakeLinkTitle;
+      document.getElementById('fakeLinkDescText').innerText = t.fakeLinkDesc;
+      document.getElementById('badgeZeroDay').innerText = t.zeroDay;
+      document.getElementById('badgeAiIntel').innerText = t.aiAnalysis;
+      document.getElementById('badgeProtection').innerText = t.interactiveProtection;
+      document.getElementById('loadingTitleText').innerText = t.loadingTitle;
+      document.getElementById('loadingDescText').innerText = t.loadingDesc;
+      document.getElementById('threatScoreLabel').innerText = t.threatScore;
+      document.getElementById('avEngineTitle').innerText = t.avTitle;
+      document.getElementById('avEngineDesc').innerText = t.avDesc;
+      document.getElementById('labelInlineScripts').innerText = t.inlineScripts;
+      document.getElementById('labelPayloads').innerText = t.payloads;
+      document.getElementById('labelHeuristics').innerText = t.heuristics;
+      document.getElementById('safetyIndicatorsTitle').innerText = t.safetyTitle;
+      document.getElementById('aiReportTitle').innerText = t.aiReportTitle;
+      document.getElementById('aiExpertBadge').innerText = lang === 'ar' ? "خبير الذكاء الاصطناعي نشط" : "AI Expert Active";
+      document.getElementById('enginesGridTitle').innerText = t.enginesTitle;
+      document.getElementById('footerText').innerHTML = t.footer;
+
+      try { localStorage.setItem('checklink_lang', lang); } catch (e) {}
+      lucide.createIcons();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      let savedLang = 'ar';
+      try { savedLang = localStorage.getItem('checklink_lang') || 'ar'; } catch (e) {}
+      document.getElementById('langSelector').value = savedLang;
+      switchLanguage(savedLang);
+
+      document.getElementById('resultsSection').classList.add('hidden');
+      document.getElementById('extraToolsSection').classList.add('hidden');
+
+      lucide.createIcons();
+    });
+
+    const ENGINES = [
+      { id: "vt", name: "VirusTotal", icon: "shield-alert", descAr: "قواعد بيانات الفيروسات (تعاني مع هجمات يوم الصفر والأنفاق الحديثة)", descEn: "Antivirus DB (Struggles with 0-day & tunnels)", descDe: "Antivirus-Datenbank", descIt: "DB Antivirus", descEs: "Base de datos antivirus", descFr: "BD Antivirus", descZh: "病毒总库", descHi: "एंटीवायरस डीबी" },
+      { id: "cf", name: "Cloudflare Radar", icon: "cloud", descAr: "تصنيف النطاقات وحركة المرور العامة", descEn: "Domain classification and public traffic", descDe: "Domain-Klassifizierung", descIt: "Classificazione dominio", descEs: "Clasificación de dominios", descFr: "Classification des domaines", descZh: "域名分类", descHi: "डोमेन वर्गीकरण" },
+      { id: "sc", name: "Sucuri SiteCheck", icon: "lock", descAr: "فحص السكريبتات والتوجيه المخفي", descEn: "Script inspection and hidden redirects", descDe: "Skriptprüfung", descIt: "Ispezione script", descEs: "Inspección de scripts", descFr: "Inspection des scripts", descZh: "脚本检查", descHi: "स्क्रिप्ट निरीक्षण" },
+      { id: "gsb", name: "Google Safe Browsing", icon: "globe", descAr: "سجلات جوجل للاصطياد المعروف (تفوت الأنفاق غير المسجلة)", descEn: "Google logs for known phishing (Misses unregistered tunnels)", descDe: "Google-Phishing-Protokolle", descIt: "Log di phishing Google", descEs: "Registros de phishing de Google", descFr: "Journaux de phishing Google", descZh: "谷歌网络钓鱼日志", descHi: "गूगल फ़िशिंग लॉग" },
+      { id: "us", name: "URLScan.io", icon: "activity", descAr: "تحليل طلبات HTTP وسلوك الصفحة", descEn: "HTTP requests and page behavior analysis", descDe: "HTTP-Analyse", descIt: "Analisi richieste HTTP", descEs: "Análisis de solicitudes HTTP", descFr: "Analyse des requêtes HTTP", descZh: "HTTP 请求分析", descHi: "HTTP अनुरोध विश्लेषण" },
+      { id: "pt", name: "PhishTank", icon: "fish", descAr: "قواعد بيانات مجتمعية لكشف الاحتيال المسجل", descEn: "Community databases for registered fraud", descDe: "Community-Betrugsdatenbank", descIt: "Database frodi", descEs: "Base de datos de fraudes", descFr: "Base de données sur les fraudes", descZh: "欺诈数据库", descHi: "धोखाधड़ी डेटाबेस" }
+    ];
+
+    async function runComprehensiveScan() {
+      const rawInput = document.getElementById('urlInput').value.trim();
+      const banner = document.getElementById('fakeLinkBanner');
+      const resultsSec = document.getElementById('resultsSection');
+      const extraToolsSec = document.getElementById('extraToolsSection');
+
+      banner.classList.add('hidden');
+
+      if (!rawInput) {
+        alert(document.documentElement.lang === 'ar' ? 'يرجى إدخال الرابط المراد فحصه أولاً' : 'Please enter a URL to scan first');
+        return;
+      }
+
+      const isFakeOrGibberish = (input) => {
+        if (input.includes(' ') || !input.includes('.')) return true;
+        try {
+          const testUrl = input.startsWith('http') ? input : 'https://' + input;
+          const parsed = new URL(testUrl);
+          let hostname = parsed.hostname.toLowerCase();
+          if (hostname.startsWith('www.')) hostname = hostname.replace('www.', '');
+          const parts = hostname.split('.');
+          if (parts.length < 2) return true;
+          const tld = parts[parts.length - 1];
+          if (tld.length < 2 || /^\d+$/.test(tld)) return true;
+          const sld = parts[parts.length - 2];
+          const allowedSafeWords = ['google', 'facebook', 'instagram', 'twitter', 'github', 'youtube', 'whatsapp', 'microsoft', 'apple', 'example', 'test', 'sprixportal', 'mywebsite', 'zeroxslam', 'check-link-ai', 'ngrok', 'tinyurl'];
+          if (allowedSafeWords.includes(sld)) return false;
+          const vowels = sld.match(/[aeiou]/g);
+          const vowelCount = vowels ? vowels.length : 0;
+          if (sld.length >= 4 && (vowelCount <= 1 || (vowelCount / sld.length < 0.2))) return true;
+          return false;
+        } catch (e) {
+          return true;
+        }
+      };
+
+      if (isFakeOrGibberish(rawInput)) {
+        banner.classList.remove('hidden');
+        resultsSec.classList.add('hidden');
+        extraToolsSec.classList.add('hidden');
+        lucide.createIcons();
+        return;
+      }
+
+      let parsedUrl;
+      try {
+        parsedUrl = new URL(rawInput.startsWith('http') ? rawInput : 'https://' + rawInput);
+      } catch (e) {
+        banner.classList.add('hidden');
+        resultsSec.classList.add('hidden');
+        extraToolsSec.classList.add('hidden');
+        return;
+      }
+
+      document.getElementById('loadingState').classList.remove('hidden');
+      resultsSec.classList.add('hidden');
+      extraToolsSec.classList.add('hidden');
+
+      const heuristics = runAdvancedHeuristics(parsedUrl);
+      runAntivirusEngine(parsedUrl.href, heuristics.score);
+      const aiReport = await fetchGeminiDeepReport(parsedUrl.href, heuristics);
+
+      renderScanOutput(parsedUrl, heuristics, aiReport);
+
+      document.getElementById('loadingState').classList.add('hidden');
+      resultsSec.classList.remove('hidden');
+      extraToolsSec.classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function runAntivirusEngine(targetUrl, riskScore) {
+      const currentLang = document.documentElement.lang || 'ar';
+      const t = translations[currentLang] || translations['ar'];
+
+      const payloadStatus = document.getElementById('payload-status');
+      const scriptStatus = document.getElementById('script-status');
+      const heuristicStatus = document.getElementById('heuristic-status');
+
+      if (riskScore >= 50) {
+        payloadStatus.textContent = t.tunnelPayloadWarn;
+        scriptStatus.textContent = t.tunnelScriptWarn;
+        heuristicStatus.textContent = t.tunnelHeuristicWarn;
+
+        payloadStatus.className = "text-sm font-semibold text-red-400";
+        scriptStatus.className = "text-sm font-semibold text-red-400";
+        heuristicStatus.className = "text-sm font-semibold text-red-400";
+      } else if (riskScore === 25) {
+        payloadStatus.textContent = t.payloadWarning;
+        scriptStatus.textContent = t.scriptWarning;
+        heuristicStatus.textContent = t.heuristicWarning;
+
+        payloadStatus.className = "text-sm font-semibold text-amber-400";
+        scriptStatus.className = "text-sm font-semibold text-amber-400";
+        heuristicStatus.className = "text-sm font-semibold text-amber-400";
+      } else {
+        payloadStatus.textContent = t.payloadSafe;
+        scriptStatus.textContent = t.scriptSafe;
+        heuristicStatus.textContent = t.heuristicSafe;
+
+        payloadStatus.className = "text-sm font-semibold text-slate-300";
+        scriptStatus.className = "text-sm font-semibold text-emerald-400";
+        heuristicStatus.className = "text-sm font-semibold text-blue-400";
+      }
+    }
+
+    function runAdvancedHeuristics(urlObj) {
+      let score = 0;
+      let findings = [];
+      let safeReasons = [];
+      const domain = urlObj.hostname.toLowerCase();
+      const currentLang = document.documentElement.lang || 'ar';
+      const t = translations[currentLang] || translations['ar'];
+
+      const myCustomDomains = ['sprixportal.jp', 'www.sprixportal.jp', 'mywebsite.com', 'checklink-ai.com', 'zeroxslam.github.io'];
+      if (myCustomDomains.some(myDomain => domain === myDomain || domain.endsWith('.' + myDomain))) {
+        safeReasons = [t.safeNote1, t.safeNote2, t.safeNote3];
+        return { score: 0, findings: [], safeReasons, isTunneling: false };
+      }
+
+      const trustedOfficialDomains = [
+        'instagram.com', 'www.instagram.com', 'instagr.am',
+        'facebook.com', 'www.facebook.com', 'fb.com', 'm.facebook.com',
+        'messenger.com', 'www.messenger.com',
+        'twitter.com', 'www.twitter.com', 'x.com', 'www.x.com',
+        'snapchat.com', 'www.snapchat.com',
+        'whatsapp.com', 'www.whatsapp.com', 'wa.me',
+        'google.com', 'www.google.com', 'youtube.com', 'www.youtube.com', 'github.com', 'www.github.com', 'ngrok.com'
+      ];
+
+      if (trustedOfficialDomains.some(trusted => domain === trusted || domain.endsWith('.' + trusted))) {
+        safeReasons = [t.safeNote1, t.safeNote2, t.safeNote3, t.safeNote4];
+        return { score: 0, findings: [], safeReasons, isTunneling: false };
+      }
+
+      const shortenerDomains = ['tinyurl.com', 'bit.ly', 't.co', 'ow.ly', 'buff.ly', 'is.gd', 'rebrand.ly'];
+      if (shortenerDomains.some(shortDomain => domain === shortDomain || domain.endsWith('.' + shortDomain))) {
+        if (urlObj.pathname === '/' || urlObj.pathname === '') {
+          safeReasons.push(t.shortenerSafeMsg);
+        } else {
+          score += 25;
+          findings.push(t.shortenerWarning);
+        }
+      }
+
+      const tunnelingDomains = [
+        'trycloudflare.com', 'loca.lt', 'ngrok.io', 'ngrok-free.app',
+        'ngrok.app', 'ngrok-free.dev', 'ngrok.dev', 'serveo.net',
+        'pinggy.io', 'localxpose.io', 'lt.run', 'nip.io'
+      ];
+      const isTunneling = tunnelingDomains.some(tunnel => domain.includes(tunnel));
+
+      if (isTunneling) {
+        score += 85;
+        findings.push(t.tunnelWarning);
+      } else if (score === 0) {
+        safeReasons.push(t.noTunnelMsg);
+      }
+
+      if (urlObj.protocol === 'https:') {
+        safeReasons.unshift(t.httpsNote);
+      }
+
+      return { score: Math.min(score, 100), findings, safeReasons, isTunneling };
+    }
+
+    async function fetchGeminiDeepReport(url, heuristics) {
+      const currentLang = document.documentElement.lang || 'ar';
+      const t = translations[currentLang] || translations['ar'];
+
+      if (heuristics.score >= 50) return t.aiDangerReport;
+      if (heuristics.score >= 25) return t.aiWarningReport;
+      return t.aiSuccessReport;
+    }
+
+    function renderScanOutput(urlObj, heuristics, aiText) {
+      const score = heuristics.score;
+      const statusCard = document.getElementById('statusCard');
+      const iconBg = document.getElementById('statusIconBg');
+      const icon = document.getElementById('statusIcon');
+      const title = document.getElementById('statusTitle');
+      const desc = document.getElementById('statusDesc');
+      const badge = document.getElementById('threatLevelBadge');
+      const scoreNum = document.getElementById('threatScoreNum');
+      const currentLang = document.documentElement.lang || 'ar';
+      const t = translations[currentLang] || translations['ar'];
+
+      scoreNum.innerText = score;
+
+      if (score >= 50) {
+        statusCard.className = "glass-card p-6 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-6 glow-danger border-red-500/30";
+        iconBg.className = "w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 bg-red-500/10 text-red-400 border border-red-500/20";
+        icon.setAttribute('data-lucide', 'shield-x');
+        title.innerText = t.criticalStatusTitle;
+        desc.innerText = t.criticalStatusDesc;
+        badge.innerText = t.criticalBadge;
+        badge.className = "text-xs px-2.5 py-1 rounded-full font-bold bg-red-500/20 text-red-300 border border-red-500/30";
+      } else if (score >= 25) {
+        statusCard.className = "glass-card p-6 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-6 glow-warning border-amber-500/30";
+        iconBg.className = "w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 bg-amber-500/10 text-amber-400 border border-amber-500/20";
+        icon.setAttribute('data-lucide', 'alert-triangle');
+        title.innerText = t.warningStatusTitle;
+        desc.innerText = t.warningStatusDesc;
+        badge.innerText = t.warningBadge;
+        badge.className = "text-xs px-2.5 py-1 rounded-full font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30";
+      } else {
+        statusCard.className = "glass-card p-6 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-6 glow-success border-emerald-500/30";
+        iconBg.className = "w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
+        icon.setAttribute('data-lucide', 'shield-check');
+        title.innerText = t.safeStatusTitle;
+        desc.innerText = t.safeStatusDesc;
+        badge.innerText = t.safeBadge;
+        badge.className = "text-xs px-2.5 py-1 rounded-full font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/20";
+      }
+
+      const safetyList = document.getElementById('safetyFactorsList');
+      safetyList.innerHTML = '';
+
+      heuristics.findings.forEach(f => {
+        const li = document.createElement('li');
+        li.className = "flex items-start gap-2.5 text-amber-200 bg-amber-950/30 p-3 rounded-xl border border-amber-500/20";
+        li.innerHTML = `<i data-lucide="alert-triangle" class="w-4 h-4 text-amber-400 shrink-0 mt-0.5"></i> <span>${f}</span>`;
+        safetyList.appendChild(li);
+      });
+
+      heuristics.safeReasons.forEach(r => {
+        const li = document.createElement('li');
+        li.className = "flex items-start gap-2.5 text-gray-200 bg-gray-950/60 p-3 rounded-xl border border-gray-800/60";
+        li.innerHTML = `<i data-lucide="check-circle" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"></i> <span>${r}</span>`;
+        safetyList.appendChild(li);
+      });
+
+      document.getElementById('aiAnalysisBody').innerHTML = aiText;
+
+      const grid = document.getElementById('enginesGrid');
+      grid.innerHTML = '';
+
+      ENGINES.forEach(eng => {
+        let engineDesc = eng.descEn;
+        if (currentLang === 'ar') engineDesc = eng.descAr;
+        else if (currentLang === 'de') engineDesc = eng.descDe;
+        else if (currentLang === 'it') engineDesc = eng.descIt;
+        else if (currentLang === 'es') engineDesc = eng.descEs;
+        else if (currentLang === 'fr') engineDesc = eng.descFr;
+        else if (currentLang === 'zh') engineDesc = eng.descZh;
+        else if (currentLang === 'hi') engineDesc = eng.descHi;
+
+        let statusLabel = t.cleanEngine;
+        let badgeStyle = "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
+
+        if (score >= 50) {
+          if (eng.id === 'vt' || eng.id === 'gsb') {
+            statusLabel = t.cleanEngine;
+            badgeStyle = "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
+          } else {
+            statusLabel = t.dangerEngine;
+            badgeStyle = "bg-red-500/10 text-red-400 border-red-500/20";
+          }
+        } else if (score >= 25 && (eng.id === 'us' || eng.id === 'sc')) {
+          statusLabel = t.suspiciousEngine;
+          badgeStyle = "bg-amber-500/10 text-amber-400 border-amber-500/20";
+        }
+
+        const card = document.createElement('div');
+        card.className = "bg-gray-950/80 border border-gray-800/80 p-4 rounded-2xl flex items-start gap-3.5 hover:border-gray-700 transition";
+        card.innerHTML = `
+          <div class="p-2.5 bg-gray-900 rounded-xl text-indigo-400 border border-gray-800 shrink-0">
+            <i data-lucide="${eng.icon}" class="w-5 h-5"></i>
+          </div>
+          <div class="flex-grow">
+            <div class="flex items-center justify-between gap-2">
+              <h4 class="font-bold text-sm text-gray-200">${eng.name}</h4>
+              <span class="text-[10px] px-2 py-0.5 rounded-full font-bold border ${badgeStyle}">${statusLabel}</span>
+            </div>
+            <p class="text-xs text-gray-400 mt-1">${engineDesc}</p>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+  </script>
+
+  <!-- ========================================== -->
+  <!-- الإضافات الجديدة مدمجة حصرياً في الأسفل -->
+  <!-- ========================================== -->
+
+  
+  <script>
+    const extraToolsContainer = document.getElementById('extraToolsSection');
+
+    function appendExtraTool(htmlContent) {
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = htmlContent;
+      extraToolsContainer.appendChild(wrapper.firstElementChild);
+    }
+  </script>
+  
+
+  <!-- 1. تشريح الرابط (Deception DNA) -->
+  <script>
+  const DNA_T = {
+    ar: {
+      title: "تشريح الرابط (Deception DNA)",
+      sub: "تحليل فوري بدون الاعتماد على قوائم الحظر — يكشف الروابط الجديدة اللي لسه محدش بلّغ عنها",
+      vizLabel: "الرابط متقسّم لأجزاء:",
+      legend: ["البروتوكول", "سب-دومين", "الدومين الحقيقي", "المسار والباراميترات", "جزء مريب"],
+      real: "الدومين الحقيقي اللي هتتفتح عليه الصفحة هو:",
+      clean: "مفيش أي مؤشر خداع في هيكل الرابط.",
+      risk: ["منخفض", "متوسط", "مرتفع"],
+      sig: {
+        userinfo: "الرابط فيه علامة @ — اللي قبلها مجرد تمويه، والوجهة الحقيقية بعدها.",
+        punycode: "الدومين مكتوب بـ Punycode (xn--) وده بيُستخدم لتقليد حروف مشابهة.",
+        nonAscii: "الدومين فيه حروف غير لاتينية ممكن تبان زي حروف إنجليزي (هجوم Homograph).",
+        ip: "الرابط بيشاور على عنوان IP مباشرة بدل اسم دومين.",
+        brand: (b, d) => `الرابط بيستخدم اسم «${b}» لكن الدومين الحقيقي هو ${d} وليس الموقع الرسمي.`,
+        typo: (b) => `اسم الدومين شبه «${b}» بحرف أو اتنين مختلفين (Typosquatting).`,
+        tld: "امتداد الدومين شائع في الحملات الاحتيالية.",
+        subs: "عدد كبير من السب-دومينات — أسلوب بيُستخدم لإخفاء الدومين الحقيقي.",
+        hyphens: "شرطات كتير في الدومين، وده نمط معروف في صفحات الاصطياد.",
+        long: "الرابط طويل بشكل غير عادي.",
+        kw: "كلمات حساسة (login / verify / wallet …) في الرابط.",
+        entropy: "اسم الدومين يبدو عشوائي (مولَّد آليًا).",
+        http: "الرابط غير مشفّر (HTTP).",
+        redirect: "الرابط فيه باراميتر بيحوّل لعنوان تاني (Open Redirect).",
+        port: "منفذ (Port) غير معتاد."
+      },
+      merged: "تشريح الرابط: مؤشرات خداع في هيكل الرابط نفسه."
+    },
+    en: {
+      title: "Deception DNA",
+      sub: "Instant structural analysis with no blocklist dependency — catches brand-new links nobody has reported yet",
+      vizLabel: "URL broken into parts:",
+      legend: ["Scheme", "Subdomain", "Real domain", "Path & query", "Suspicious part"],
+      real: "The page will actually load from:",
+      clean: "No deception indicators found in the URL structure.",
+      risk: ["Low", "Medium", "High"],
+      sig: {
+        userinfo: "URL contains '@' — everything before it is decoy; the real host comes after.",
+        punycode: "Domain uses Punycode (xn--), often used to mimic lookalike characters.",
+        nonAscii: "Domain contains non-Latin characters that may look Latin (homograph attack).",
+        ip: "URL points to a raw IP address instead of a domain name.",
+        brand: (b, d) => `URL uses the name "${b}" but the real domain is ${d}, not the official site.`,
+        typo: (b) => `Domain name is one or two characters away from "${b}" (typosquatting).`,
+        tld: "TLD is common in abuse campaigns.",
+        subs: "Many subdomain levels — a trick to hide the real domain.",
+        hyphens: "Many hyphens in the domain, a known phishing pattern.",
+        long: "Unusually long URL.",
+        kw: "Sensitive keywords (login / verify / wallet …) in the URL.",
+        entropy: "Domain name looks random (machine-generated).",
+        http: "Link is not encrypted (HTTP).",
+        redirect: "URL carries a redirect parameter (open redirect).",
+        port: "Unusual port."
+      },
+      merged: "Deception DNA: deception indicators found in the URL structure."
+    }
+  };
+
+  const DNA_BRANDS = {
+    paypal: ['paypal.com'], google: ['google.com','goo.gl'], facebook: ['facebook.com','fb.com'],
+    instagram: ['instagram.com'], microsoft: ['microsoft.com','live.com'], apple: ['apple.com','icloud.com'],
+    amazon: ['amazon.com'], netflix: ['netflix.com'], whatsapp: ['whatsapp.com','wa.me'],
+    binance: ['binance.com'], vodafone: ['vodafone.com','vodafone.com.eg'], fawry: ['fawry.com'],
+    instapay: ['instapay.eg'], telegram: ['telegram.org','t.me'], tiktok: ['tiktok.com'],
+    github: ['github.com'], youtube: ['youtube.com','youtu.be'], twitter: ['twitter.com','x.com']
+  };
+
+  function dnaLang() {
+    const l = document.documentElement.lang || 'ar';
+    return l === 'ar' ? 'ar' : 'en';
+  }
+  function dnaEsc(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+  function dnaLev(a, b) {
+    const m = a.length, n = b.length, d = Array.from({length: m + 1}, (_, i) => [i]);
+    for (let j = 1; j <= n; j++) d[0][j] = j;
+    for (let i = 1; i <= m; i++) for (let j = 1; j <= n; j++)
+      d[i][j] = Math.min(d[i-1][j] + 1, d[i][j-1] + 1, d[i-1][j-1] + (a[i-1] === b[j-1] ? 0 : 1));
+    return d[m][n];
+  }
+  function dnaEntropy(s) {
+    const f = {}; for (const c of s) f[c] = (f[c] || 0) + 1;
+    return -Object.values(f).reduce((a, v) => a + (v / s.length) * Math.log2(v / s.length), 0);
+  }
+  function dnaSplitHost(host) {
+    const parts = host.split('.');
+    const secondLevel = ['co','com','org','net','gov','edu','ac'];
+    let n = 2;
+    if (parts.length >= 3 && parts[parts.length-1].length === 2 && secondLevel.includes(parts[parts.length-2])) n = 3;
+    const regParts = parts.slice(-n);
+    return { sub: parts.slice(0, -n).join('.'), reg: regParts.join('.'), sld: regParts[0], tld: parts[parts.length-1] };
+  }
+
+  function runDeceptionDNA(urlObj, rawInput) {
+    const sigs = [];
+    const host = urlObj.hostname.toLowerCase();
+    const T = DNA_T[dnaLang()].sig;
+    const add = (key, w, text, mark) => sigs.push({ key, w, text, mark });
+    const isIP = /^(\d{1,3}\.){3}\d{1,3}$/.test(host) || host.includes(':');
+    const { sub, reg, sld, tld } = isIP ? { sub: '', reg: host, sld: host, tld: '' } : dnaSplitHost(host);
+
+    if (rawInput && /^[a-z]+:\/\/[^\/?#]*@/i.test(rawInput.trim())) add('userinfo', 60, T.userinfo, '@');
+    if (host.includes('xn--')) add('punycode', 45, T.punycode, host);
+    if (/[^\x00-\x7F]/.test(rawInput || '')) add('nonAscii', 45, T.nonAscii, null);
+    if (isIP) add('ip', 40, T.ip, host);
+
+    if (!isIP) {
+      const norm = sld.replace(/rn/g, 'm').replace(/0/g, 'o').replace(/1/g, 'l').replace(/3/g, 'e').replace(/5/g, 's').replace(/@/g, 'a');
+      const tokens = host.split(/[.\-]/);
+      for (const [brand, reals] of Object.entries(DNA_BRANDS)) {
+        if (reals.some(r => reg === r || host.endsWith('.' + r))) continue;
+        if (tokens.includes(brand)) { add('brand', 55, T.brand(brand, reg), brand); break; }
+        if (brand.length >= 5 && (norm === brand || (sld !== brand && dnaLev(norm, brand) <= 2 && Math.abs(norm.length - brand.length) <= 2))) {
+          add('typo', 55, T.typo(brand), sld); break;
+        }
+      }
+      if (['zip','mov','tk','ml','ga','cf','gq','xyz','top','click','work','rest','icu','cyou','buzz'].includes(tld)) add('tld', 15, T.tld, '.' + tld);
+      if (sub && sub.split('.').length >= 3) add('subs', 15, T.subs, sub);
+      if ((host.match(/-/g) || []).length >= 3) add('hyphens', 10, T.hyphens, null);
+      if (sld.length >= 8 && dnaEntropy(sld) > 3.3 && !/[aeiou]{1}/.test(sld.slice(0, 3))) add('entropy', 10, T.entropy, sld);
+    }
+
+    const full = urlObj.href;
+    if (full.length > 100) add('long', 8, T.long, null);
+    const kw = (host + urlObj.pathname).toLowerCase().match(/login|signin|verify|secure|account|update|wallet|password|confirm|billing|recover/g);
+    if (kw) add('kw', kw.length >= 2 ? 20 : 12, T.kw, null);
+    if (urlObj.protocol === 'http:') add('http', 10, T.http, null);
+    if (/[?&][a-z_]*(url|redirect|next|goto|return)=https?/i.test(urlObj.search)) add('redirect', 15, T.redirect, null);
+    if (urlObj.port && !['80','443'].includes(urlObj.port)) add('port', 10, T.port, ':' + urlObj.port);
+
+    const score = Math.min(100, sigs.reduce((a, s) => a + s.w, 0));
+    return { score, sigs, sub, reg, isIP, host };
+  }
+
+  function mergeDNA(heur, dna) {
+    const t = DNA_T[dnaLang()];
+    if (dna.score >= 50) {
+      heur.score = Math.max(heur.score, 85);
+      heur.findings.push('<strong>' + t.merged + '</strong>');
+    } else if (dna.score >= 20 && heur.score < 25) {
+      heur.score = 25;
+      heur.findings.push('<strong>' + t.merged + '</strong>');
+    }
+    return heur;
+  }
+
+  function renderDNA(urlObj, dna, rawInput) {
+    const L = dnaLang(), t = DNA_T[L];
+    const titleEl = document.getElementById('dnaTitle');
+    const subEl = document.getElementById('dnaSub');
+    const vizLabelEl = document.getElementById('dnaVizLabel');
+    if (titleEl) titleEl.innerText = t.title;
+    if (subEl) subEl.innerText = t.sub;
+    if (vizLabelEl) vizLabelEl.innerText = t.vizLabel;
+
+    const marks = dna.sigs.map(s => s.mark).filter(Boolean);
+    const bad = x => marks.some(m => m && x && x.includes(m.replace(/^\./, '')));
+    const span = (cls, txt) => `<span class="${cls}">${dnaEsc(txt)}</span>`;
+    const sub = dna.sub, reg = dna.reg;
+    let html = span('text-gray-500', urlObj.protocol + '//');
+    if (sub) html += span(bad(sub) ? 'text-red-300 bg-red-500/20 rounded px-0.5' : 'text-amber-300', sub + '.');
+    html += span(bad(reg) ? 'text-red-300 bg-red-500/20 rounded px-0.5 font-bold' : 'text-emerald-300 font-bold', reg);
+    if (urlObj.port) html += span('text-red-300', ':' + urlObj.port);
+    html += span('text-sky-300', urlObj.pathname + urlObj.search + urlObj.hash);
+
+    const vizEl = document.getElementById('dnaUrlViz');
+    if (vizEl) vizEl.innerHTML = html;
+
+    const colors = ['text-gray-500', 'text-amber-300', 'text-emerald-300', 'text-sky-300', 'text-red-300'];
+    const legendEl = document.getElementById('dnaLegend');
+    if (legendEl) legendEl.innerHTML = t.legend.map((l, i) => `<span class="${colors[i]}">● ${l}</span>`).join('');
+
+    const lvl = dna.score >= 50 ? 2 : dna.score >= 20 ? 1 : 0;
+    const palette = [
+      'bg-emerald-500/10 text-emerald-300 border-emerald-500/30',
+      'bg-amber-500/10 text-amber-300 border-amber-500/30',
+      'bg-red-500/10 text-red-300 border-red-500/30'
+    ];
+    const badge = document.getElementById('dnaScoreBadge');
+    if (badge) {
+      badge.className = 'text-xs font-bold px-3 py-1 rounded-full border ' + palette[lvl];
+      badge.innerText = `${t.risk[lvl]} · ${dna.score}/100`;
+    }
+
+    const box = document.getElementById('dnaRealBox');
+    if (box) {
+      box.className = 'p-4 rounded-2xl border mb-4 text-sm ' + palette[lvl];
+      box.innerHTML = `${dnaEsc(t.real)} <span dir="ltr" class="font-mono font-bold">${dnaEsc(dna.reg)}</span>`;
+    }
+
+    const ul = document.getElementById('dnaSignals');
+    if (ul) {
+      ul.innerHTML = '';
+      if (!dna.sigs.length) {
+        ul.innerHTML = `<li class="flex items-start gap-2.5 text-gray-200 bg-gray-950/60 p-3 rounded-xl border border-gray-800/60"><i data-lucide="check-circle" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"></i><span>${t.clean}</span></li>`;
+      }
+      dna.sigs.sort((a, b) => b.w - a.w).forEach(s => {
+        const hi = s.w >= 40;
+        const li = document.createElement('li');
+        li.className = 'flex items-start gap-2.5 p-3 rounded-xl border ' + (hi ? 'text-red-200 bg-red-950/30 border-red-500/20' : 'text-amber-200 bg-amber-950/30 border-amber-500/20');
+        li.innerHTML = `<i data-lucide="${hi ? 'octagon-alert' : 'triangle-alert'}" class="w-4 h-4 shrink-0 mt-0.5"></i><span class="flex-grow">${dnaEsc(s.text)}</span><span class="text-[10px] font-bold opacity-70">+${s.w}</span>`;
+        ul.appendChild(li);
+      });
+    }
+  }
+
+  appendExtraTool(`
+    <div id="dnaCard" class="glass-card p-6 sm:p-7 rounded-3xl border border-cyan-500/20 mb-6">
+      <div class="flex items-center justify-between mb-4 gap-3">
+        <div class="flex items-center gap-3">
+          <div class="p-2 bg-cyan-500/10 rounded-xl text-cyan-400"><i data-lucide="dna" class="w-5 h-5"></i></div>
+          <div>
+            <h3 id="dnaTitle" class="text-lg font-bold text-white">تشريح الرابط (Deception DNA)</h3>
+            <p id="dnaSub" class="text-xs text-gray-400">تحليل فوري بدون الاعتماد على قوائم الحظر — يكشف الروابط الجديدة اللي لسه محدش بلّغ عنها</p>
+          </div>
+        </div>
+        <span id="dnaScoreBadge" class="text-xs font-bold px-3 py-1 rounded-full border"></span>
+      </div>
+
+      <div class="text-xs text-gray-400 mb-1" id="dnaVizLabel">الرابط متقسّم لأجزاء:</div>
+      <div id="dnaUrlViz" dir="ltr" class="bg-gray-950/80 p-4 rounded-2xl border border-gray-800 font-mono text-sm break-all mb-3"></div>
+
+      <div class="flex flex-wrap gap-3 text-[11px] text-gray-400 mb-4" id="dnaLegend"></div>
+
+      <div id="dnaRealBox" class="p-4 rounded-2xl border mb-4 text-sm"></div>
+
+      <ul id="dnaSignals" class="space-y-2.5 text-sm"></ul>
+    </div>
+  `);
+
+  const origHeuristics = runAdvancedHeuristics;
+  runAdvancedHeuristics = function (urlObj) {
+    const h = origHeuristics(urlObj);
+    const dna = runDeceptionDNA(urlObj, document.getElementById('urlInput').value);
+    window.__lastDNA = dna;
+    return mergeDNA(h, dna);
+  };
+
+  const origRenderDNA = renderScanOutput;
+  renderScanOutput = function (urlObj, heuristics, aiText) {
+    origRenderDNA(urlObj, heuristics, aiText);
+    if (window.__lastDNA) renderDNA(urlObj, window.__lastDNA, document.getElementById('urlInput').value);
+    lucide.createIcons();
+  };
+  </script>
+
+
+  
+  <!-- 3. عدّاد الخصوصية والسجل المحلي (Privacy Meter) -->
+  <script>
+  (function () {
+    const L = () => ((document.documentElement.lang || 'ar') === 'ar' ? 'ar' : 'en');
+    const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const KEY = 'checklink_history_v1', ON_KEY = 'checklink_history_on', MAX = 30;
+
+    const TXT = {
+      ar: { title:'عدّاد الخصوصية والسجل المحلي', sub:'مش بنصدّق نفسنا — بنقيس: كام طلب شبكي طلع من متصفحك أثناء الفحص؟',
+        idle:'لسه ما عملتش فحص. اعمل فحص وهتشوف العدّاد.', dataReq:'طلبات ممكن تحمل بياناتك (fetch / XHR / beacon)', staticReq:'تحميلات ثابتة (صور / سكريبتات / خطوط)',
+        ok:'✅ الفحص تم كله داخل متصفحك — مفيش رابط اتبعت لأي سيرفر.', warn:'⚠️ فيه طلبات خرجت أثناء الفحص — راجع الوجهات تحت.',
+        dests:'الوجهات:', note:'العدّاد بيقيس الطلبات الفعلية من المتصفح (Resource Timing), فلو ربطت الموقع بخدمة خارجية هيظهر هنا بصراحة.',
+        stats:'إحصائيات فحوصاتك', safe:'آمن', mid:'متوسط', crit:'حرج', hist:'سجل الفحوصات (محفوظ على جهازك فقط)', none:'السجل فاضي.',
+        save:'احفظ السجل على جهازي', clear:'مسح السجل', exp:'تصدير JSON', seen:(n)=>`دومين شفته قبل كده ${n} مرة.`,
+        note2:'بنحفظ الدومين والمسار فقط (من غير باراميترات) عشان مفيش توكنات تتخزن.' },
+      en: { title:'Privacy Meter & Local History', sub:'We do not just claim it — we measure it: how many network requests left your browser during the scan?',
+        idle:'No scan yet. Run a scan to see the meter.', dataReq:'Requests that could carry your data (fetch / XHR / beacon)', staticReq:'Static loads (images / scripts / fonts)',
+        ok:'✅ The scan ran entirely inside your browser — no link was sent to any server.', warn:'⚠️ Requests left during the scan — review the destinations below.',
+        dests:'Destinations:', note:'The meter measures real browser requests (Resource Timing), so if you ever connect the site to an external service it will show here honestly.',
+        stats:'Your scan statistics', safe:'Safe', mid:'Medium', crit:'Critical', hist:'Scan history (stored on your device only)', none:'History is empty.',
+        save:'Save history on my device', clear:'Clear history', exp:'Export JSON', seen:(n)=>`You have scanned this domain ${n} time(s) before.`,
+        note2:'Only the domain and path are stored (no query parameters) so no tokens are kept.' }
+    };
+
+    const store = {
+      get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+      set(k, v) { try { localStorage.setItem(k, v); return true; } catch (e) { return false; } },
+      del(k) { try { localStorage.removeItem(k); } catch (e) {} }
+    };
+    const loadHistory = () => { try { const a = JSON.parse(store.get(KEY) || '[]'); return Array.isArray(a) ? a : []; } catch (e) { return []; } };
+    const saveOn = () => store.get(ON_KEY) !== '0';
+    const lvlOf = s => s >= 50 ? 2 : s >= 25 ? 1 : 0;
+
+    function pushHistory(urlObj, score) {
+      const h = loadHistory();
+      const seen = h.filter(e => e.h === urlObj.hostname).length;
+      if (saveOn()) {
+        h.unshift({ h: urlObj.hostname, p: (urlObj.pathname || '/').slice(0, 60), s: score, t: Date.now() });
+        store.set(KEY, JSON.stringify(h.slice(0, MAX)));
+      }
+      return seen;
+    }
+
+    let entries = [], scanStart = null, lastSeen = null, lastMeter = null;
+    let po = null;
+    try { po = new PerformanceObserver(l => { entries.push(...l.getEntries()); }); po.observe({ type: 'resource' }); } catch (e) { po = null; }
+
+    function measure() {
+      if (po) entries.push(...po.takeRecords());
+      const rel = entries.filter(e => e.startTime >= scanStart);
+      const data = rel.filter(e => ['fetch', 'xmlhttprequest', 'beacon'].includes(e.initiatorType));
+      const hosts = [...new Set(data.map(e => { try { return new URL(e.name).host; } catch (x) { return e.name; } }))].slice(0, 5);
+      lastMeter = { data: data.length, other: rel.length - data.length, hosts, supported: !!po };
+      render();
+    }
+
+    const card = document.createElement('div');
+    card.className = 'glass-card p-6 sm:p-7 rounded-3xl border border-teal-500/20 mb-8';
+    extraToolsContainer.appendChild(card);
+
+    function render() {
+      const t = TXT[L()], hist = loadHistory();
+      const counts = [0, 0, 0]; hist.forEach(e => counts[lvlOf(e.s)]++);
+      const tot = Math.max(1, hist.length);
+      const m = lastMeter;
+      const meter = !m ? `<div class="text-sm text-gray-400">${t.idle}</div>` : `
+        <div class="flex flex-wrap items-center gap-6">
+          <div><div class="text-4xl font-black ${m.data === 0 ? 'text-emerald-300' : 'text-amber-300'}">${m.data}</div><div class="text-[11px] text-gray-400 max-w-[14rem]">${t.dataReq}</div></div>
+          <div><div class="text-2xl font-black text-gray-300">${m.other}</div><div class="text-[11px] text-gray-400 max-w-[14rem]">${t.staticReq}</div></div>
+        </div>
+        <div class="mt-3 text-sm ${m.data === 0 ? 'text-emerald-200' : 'text-amber-200'}">${m.data === 0 ? t.ok : t.warn}</div>
+        ${m.data ? `<div dir="ltr" class="mt-1 text-xs font-mono text-gray-300">${t.dests} ${m.hosts.map(esc).join(', ')}</div>` : ''}
+        ${lastSeen ? `<div class="mt-2 text-xs text-sky-300">${t.seen(lastSeen)}</div>` : ''}`;
+      const bar = (label, n, c) => `<div class="flex items-center gap-2 text-xs"><span class="w-14 text-gray-400">${label}</span><div class="flex-grow h-2 bg-gray-800 rounded-full overflow-hidden"><div class="${c} h-full" style="width:${Math.round(n / tot * 100)}%"></div></div><span class="w-6 text-gray-500">${n}</span></div>`;
+      const chipC = ['text-emerald-300', 'text-amber-300', 'text-red-300'];
+      const rows = hist.length ? hist.slice(0, 8).map(e => `<div class="flex items-center justify-between gap-3 bg-gray-950/70 border border-gray-800 rounded-xl p-2.5 text-xs">
+          <span dir="ltr" class="font-mono break-all text-gray-200">${esc(e.h)}${esc(e.p === '/' ? '' : e.p)}</span>
+          <span class="shrink-0 ${chipC[lvlOf(e.s)]} font-bold">${e.s}</span></div>`).join('') : `<div class="text-xs text-gray-400">${t.none}</div>`;
+
+      card.innerHTML = `
+        <div class="flex items-center gap-3 mb-4"><div class="p-2 bg-teal-500/10 rounded-xl text-teal-400"><i data-lucide="shield-half" class="w-5 h-5"></i></div>
+          <div><h3 class="text-lg font-bold text-white">${t.title}</h3><p class="text-xs text-gray-400">${t.sub}</p></div></div>
+        <div class="bg-gray-950/80 border border-gray-800 rounded-2xl p-4">${meter}<div class="mt-3 text-[11px] text-gray-500">${t.note}</div></div>
+        <div class="mt-5 text-sm font-bold text-white mb-2">${t.stats}</div>
+        <div class="space-y-1.5">${bar(t.safe, counts[0], 'bg-emerald-400')}${bar(t.mid, counts[1], 'bg-amber-400')}${bar(t.crit, counts[2], 'bg-red-400')}</div>
+        <div class="mt-5 text-sm font-bold text-white mb-2">${t.hist}</div>
+        <div class="space-y-1.5">${rows}</div>
+        <div class="flex flex-wrap items-center gap-3 mt-3">
+          <label class="flex items-center gap-2 text-xs text-gray-300 cursor-pointer"><input id="pmOn" type="checkbox" ${saveOn() ? 'checked' : ''}> ${t.save}</label>
+          <button id="pmExp" class="bg-gray-800 hover:bg-gray-700 text-white text-xs font-bold px-4 py-1.5 rounded-lg">${t.exp}</button>
+          <button id="pmClear" class="bg-gray-800 hover:bg-gray-700 text-red-300 text-xs font-bold px-4 py-1.5 rounded-lg">${t.clear}</button>
+        </div>
+        <div class="mt-2 text-[11px] text-gray-500">${t.note2}</div>`;
+
+      const pmOnEl = document.getElementById('pmOn');
+      if (pmOnEl) pmOnEl.onchange = e => { store.set(ON_KEY, e.target.checked ? '1' : '0'); };
+      const pmClearEl = document.getElementById('pmClear');
+      if (pmClearEl) pmClearEl.onclick = () => { store.del(KEY); render(); };
+      const pmExpEl = document.getElementById('pmExp');
+      if (pmExpEl) pmExpEl.onclick = () => {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([JSON.stringify(loadHistory(), null, 2)], { type: 'application/json' }));
+        a.download = 'checklink-history.json'; document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+      };
+      lucide.createIcons();
+    }
+    render();
+    const sel = document.getElementById('langSelector'); if (sel) sel.addEventListener('change', render);
+
+    const origScan = runComprehensiveScan;
+    runComprehensiveScan = async function () {
+      scanStart = performance.now(); entries = []; lastSeen = null;
+      const r = await origScan.apply(this, arguments);
+      setTimeout(measure, 400);
+      return r;
+    };
+    const origRender = renderScanOutput;
+    renderScanOutput = function (urlObj, heuristics, aiText) {
+      origRender(urlObj, heuristics, aiText);
+      try { lastSeen = pushHistory(urlObj, heuristics.score) || null; } catch (e) {}
+    };
+    window.__priv = { pushHistory, loadHistory, lvlOf };
+  })();
+  </script>
+
+  <!-- 4. محلل ترويسة الإيميل (Email Header Forensics) -->
+  <script>
+  (function () {
+    const L = () => ((document.documentElement.lang || 'ar') === 'ar' ? 'ar' : 'en');
+    const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+    const BRANDS = { paypal:['paypal.com'], google:['google.com','gmail.com'], facebook:['facebook.com','facebookmail.com','fb.com'],
+      instagram:['instagram.com'], microsoft:['microsoft.com','outlook.com','live.com'], apple:['apple.com','icloud.com'], amazon:['amazon.com'],
+      netflix:['netflix.com'], binance:['binance.com'], vodafone:['vodafone.com','vodafone.com.eg'], fawry:['fawry.com'], instapay:['instapay.eg'],
+      linkedin:['linkedin.com'], twitter:['twitter.com','x.com'], dhl:['dhl.com'], fedex:['fedex.com'], bank:[] };
+    const BADTLD = ['zip','mov','tk','ml','ga','cf','gq','xyz','top','click','work','rest','icu','cyou','buzz'];
+
+    const TXT = {
+      ar: { title:'محلل ترويسة الإيميل (Email Header Forensics)', sub:'الصق ترويسة الإيميل الكاملة (Show original) — بنكشف لو المرسل مزوّر من غير ما نفتح أي لينك',
+        ph:'الصق ترويسة الإيميل هنا (From, Return-Path, Authentication-Results, Received ...)', btn:'حلّل الترويسة', sample:'جرّب مثال', empty:'الصق الترويسة الأول.',
+        none:'مفيش ترويسة مفهومة في النص (لازم تحتوي سطور زي From: و Received:).',
+        risk:['منخفض','متوسط','مرتفع'], auth:'نتيجة التحقق', ident:'هوية المرسل', find:'مؤشرات الاشتباه', clean:'مفيش تعارضات واضحة في الترويسة.',
+        from:'From (المرسل الظاهر)', reply:'Reply-To (الرد يروح لـ)', ret:'Return-Path (المرسل الفعلي)', mid:'Message-ID', origin:'أول IP عام في السلسلة (حسب ادعاء الترويسة)', na:'—',
+        note:'تنبيه: الترويسة بتقلّل الشك مش بتثبت الأمان. فقط سطور Received اللي أضافها خادم بريدك موثوقة، وأي سطر تحتها ممكن يكون مزوّر.',
+        f:{ spf:(r)=>`فحص SPF = ${r}: الخادم اللي بعت مش مصرّح له يرسل باسم الدومين ده.`, spfw:(r)=>`فحص SPF = ${r}: النتيجة غير مؤكدة.`,
+            dkim:(r)=>`توقيع DKIM = ${r}: الرسالة مش موقّعة صح، وممكن تكون اتعدلت أو اتزوّرت.`, dkimn:'مفيش توقيع DKIM على الرسالة.',
+            dmarc:(r)=>`فحص DMARC = ${r}: الرسالة فشلت في سياسة حماية الدومين.`, dmarcn:'مفيش سياسة DMARC مطبّقة على الدومين.',
+            noauth:'مفيش نتايج تحقق (SPF/DKIM/DMARC) في الترويسة، فمقدرناش نتأكد من هوية المرسل.',
+            reply:(a,b)=>`الرد هيروح لدومين مختلف (${b}) عن دومين المرسل الظاهر (${a}) — أسلوب شائع في الاحتيال.`,
+            ret:(a,b)=>`المرسل الفعلي (Return-Path) من دومين ${b} مختلف عن الظاهر ${a}.`,
+            hfrom:(a,b)=>`دومين header.from في نتايج التحقق (${b}) مختلف عن دومين From (${a}).`,
+            mid:(a,b)=>`معرّف الرسالة (Message-ID) من دومين ${b} مش نفس دومين المرسل ${a}.`,
+            brand:(n,d)=>`الاسم الظاهر «${n}» بيوحي بجهة رسمية، لكن العنوان الفعلي من ${d}.`,
+            emb:(e,d)=>`الاسم الظاهر فيه عنوان إيميل (${e}) غير العنوان الحقيقي من ${d}.`,
+            tld:(t)=>`دومين المرسل بامتداد .${t} الشائع في الحملات الاحتيالية.`,
+            dna:(x)=>`دومين المرسل: ${x}` } },
+      en: { title:'Email Header Forensics', sub:'Paste the full email headers (Show original) — we detect spoofed senders without opening any link',
+        ph:'Paste the email headers here (From, Return-Path, Authentication-Results, Received ...)', btn:'Analyze headers', sample:'Try an example', empty:'Paste the headers first.',
+        none:'No readable headers found (it needs lines like From: and Received:).',
+        risk:['Low','Medium','High'], auth:'Authentication results', ident:'Sender identity', find:'Suspicion indicators', clean:'No obvious conflicts in the headers.',
+        from:'From (displayed sender)', reply:'Reply-To (replies go to)', ret:'Return-Path (actual sender)', mid:'Message-ID', origin:'First public IP in the chain (as claimed by headers)', na:'—',
+        note:'Note: headers can lower suspicion but never prove safety. Only the Received lines added by your own mail server are trustworthy; lower ones can be forged.',
+        f:{ spf:(r)=>`SPF = ${r}: the sending server is not authorized to send for this domain.`, spfw:(r)=>`SPF = ${r}: inconclusive result.`,
+            dkim:(r)=>`DKIM = ${r}: the message is not properly signed and may have been altered or forged.`, dkimn:'The message carries no DKIM signature.',
+            dmarc:(r)=>`DMARC = ${r}: the message failed the domain’s protection policy.`, dmarcn:'No DMARC policy is enforced for the domain.',
+            noauth:'No authentication results (SPF/DKIM/DMARC) in the headers, so sender identity could not be verified.',
+            reply:(a,b)=>`Replies go to a different domain (${b}) than the displayed sender (${a}) — a common scam pattern.`,
+            ret:(a,b)=>`The actual sender (Return-Path) is from ${b}, different from the displayed ${a}.`,
+            hfrom:(a,b)=>`header.from in the authentication results (${b}) differs from the From domain (${a}).`,
+            mid:(a,b)=>`Message-ID comes from ${b}, not the sender’s domain ${a}.`,
+            brand:(n,d)=>`Display name "${n}" suggests an official organization, but the real address is from ${d}.`,
+            emb:(e,d)=>`Display name contains an email address (${e}) different from the real one from ${d}.`,
+            tld:(t)=>`Sender domain uses the .${t} TLD, common in scam campaigns.`,
+            dna:(x)=>`Sender domain: ${x}` } }
+    };
+
+    const SAMPLE = `Authentication-Results: mx.google.com; spf=fail (google.com: domain of support@paypa1-secure.xyz does not designate 203.0.113.45 as permitted sender) smtp.mailfrom=support@paypa1-secure.xyz; dkim=none; dmarc=fail (p=NONE) header.from=paypa1-secure.xyz
+Received: from mail.paypa1-secure.xyz (unknown [203.0.113.45]) by mx.google.com with ESMTP id abc123; Sat, 7 Nov 2026 10:02:11 -0800
+Received: from [10.0.0.5] (localhost [127.0.0.1]) by mail.paypa1-secure.xyz with ESMTPA; Sat, 7 Nov 2026 18:02:09 +0000
+Return-Path: <bounce@mailer-x12.top>
+From: "PayPal Security" <support@paypa1-secure.xyz>
+Reply-To: "PayPal" <recover.account@gmail.com>
+To: you@example.com
+Subject: Urgent: verify your account
+Message-ID: <20261107.1234@mailer-x12.top>
+Date: Sat, 7 Nov 2026 18:02:09 +0000`;
+
+    function reg(domain) {
+      const p = domain.toLowerCase().replace(/[>\s]/g, '').split('.');
+      const sl = ['co','com','org','net','gov','edu','ac'];
+      const n = p.length >= 3 && p[p.length - 1].length === 2 && sl.includes(p[p.length - 2]) ? 3 : 2;
+      return p.slice(-n).join('.');
+    }
+    function parseHeaders(raw) {
+      const head = raw.replace(/\r/g, '').split(/\n\s*\n/)[0].replace(/\n[ \t]+/g, ' ');
+      const map = {};
+      head.split('\n').forEach(line => {
+        const m = line.match(/^([!-9;-~]+):\s*(.*)$/);
+        if (m) (map[m[1].toLowerCase()] = map[m[1].toLowerCase()] || []).push(m[2]);
+      });
+      return map;
+    }
+    function parseAddr(v) {
+      if (!v) return null;
+      const m = v.match(/^\s*"?([^"<]*?)"?\s*<([^>]+)>/);
+      const name = m ? m[1].trim() : '';
+      const addr = (m ? m[2] : (v.match(/[^\s<>"]+@[^\s<>"]+/) || [''])[0]).trim().toLowerCase();
+      const domain = addr.includes('@') ? addr.split('@').pop() : '';
+      return { name, addr, domain };
+    }
+    const isPrivate = ip => /^(10\.|127\.|192\.168\.|169\.254\.|172\.(1[6-9]|2\d|3[01])\.)/.test(ip);
+
+    function analyze(raw) {
+      const t = TXT[L()].f;
+      const h = parseHeaders(raw);
+      if (!h.from && !h.received && !h['authentication-results']) return null;
+      const from = parseAddr((h.from || [])[0]);
+      const reply = parseAddr((h['reply-to'] || [])[0]);
+      const ret = parseAddr((h['return-path'] || [])[0]);
+      const mid = ((h['message-id'] || [''])[0].match(/@([^>\s]+)/) || [])[1] || '';
+      const findings = []; let score = 0;
+      const add = (w, text) => { score += w; findings.push({ w, text }); };
+
+      const ar = (h['authentication-results'] || []).join(' ; ');
+      let spf = (ar.match(/spf=(\w+)/i) || [])[1], dkim = (ar.match(/dkim=(\w+)/i) || [])[1], dmarc = (ar.match(/dmarc=(\w+)/i) || [])[1];
+      if (!spf && h['received-spf']) spf = (h['received-spf'][0].match(/^\s*(\w+)/) || [])[1];
+      spf = spf ? spf.toLowerCase() : null;
+      dkim = dkim ? dkim.toLowerCase() : null;
+      dmarc = dmarc ? dmarc.toLowerCase() : null;
+      const hfrom = ((ar.match(/header\.from=([^\s;)]+)/i) || [])[1] || '').toLowerCase();
+
+      if (!spf && !dkim && !dmarc) add(10, t.noauth);
+      else {
+        if (spf === 'fail') add(25, t.spf(spf)); else if (spf === 'softfail') add(15, t.spf(spf)); else if (spf && spf !== 'pass') add(8, t.spfw(spf));
+        if (dkim === 'fail') add(25, t.dkim(dkim)); else if (dkim === 'none') add(10, t.dkimn); else if (dkim && dkim !== 'pass') add(8, t.dkim(dkim));
+        if (dmarc === 'fail') add(30, t.dmarc(dmarc)); else if (dmarc === 'none') add(8, t.dmarcn);
+      }
+
+      if (from && from.domain) {
+        const fr = reg(from.domain);
+        if (reply && reply.domain && reg(reply.domain) !== fr) add(20, t.reply(fr, reg(reply.domain)));
+        if (ret && ret.domain && reg(ret.domain) !== fr) add(10, t.ret(fr, reg(ret.domain)));
+        if (hfrom && reg(hfrom) !== fr) add(15, t.hfrom(fr, reg(hfrom)));
+        if (mid && reg(mid) !== fr) add(8, t.mid(fr, reg(mid)));
+
+        const dn = (from.name || '').toLowerCase();
+        const emb = dn.match(/[^\s<>"]+@[^\s<>"]+/);
+        if (emb && reg(emb[0].split('@').pop()) !== fr) add(30, t.emb(emb[0], fr));
+        else for (const [b, reals] of Object.entries(BRANDS)) {
+          if (new RegExp('\\b' + b + '\\b').test(dn) && !reals.some(r => fr === r || fr.endsWith('.' + r))) { add(35, t.brand(from.name, fr)); break; }
+        }
+        const tld = fr.split('.').pop();
+        if (BADTLD.includes(tld)) add(10, t.tld(tld));
+
+        if (typeof runDeceptionDNA === 'function') {
+          try {
+            const d = runDeceptionDNA(new URL('https://' + from.domain), 'https://' + from.domain);
+            d.sigs.filter(s => ['brand', 'typo', 'punycode', 'nonAscii'].includes(s.key)).forEach(s => add(s.w, t.dna(s.text)));
+          } catch (e) {}
+        }
+      }
+
+      let origin = null;
+      (h.received || []).slice().reverse().some(r => {
+        const ips = [...r.matchAll(/\[?(\d{1,3}(?:\.\d{1,3}){3})\]?/g)].map(m => m[1]).filter(ip => !isPrivate(ip) && ip.split('.').every(n => +n <= 255));
+        if (ips.length) { origin = ips[0]; return true; } return false;
+      });
+
+      score = Math.min(100, score);
+      return { score, findings, auth: { spf, dkim, dmarc }, ids: { from: from && from.addr, reply: reply && reply.addr, ret: ret && ret.addr, mid, origin } };
+    }
+
+    appendExtraTool(`
+      <div class="glass-card p-6 sm:p-7 rounded-3xl border border-sky-500/20 mb-8">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="p-2 bg-sky-500/10 rounded-xl text-sky-400"><i data-lucide="mail-warning" class="w-5 h-5"></i></div>
+          <div><h3 id="ehTitle" class="text-lg font-bold text-white"></h3><p id="ehSub" class="text-xs text-gray-400"></p></div>
+        </div>
+        <textarea id="ehInput" dir="ltr" rows="6" class="w-full bg-gray-950/80 border border-gray-700/80 p-4 rounded-2xl text-xs font-mono text-gray-100 placeholder-gray-500 focus:outline-none focus:border-sky-500"></textarea>
+        <div class="flex gap-2 mt-3">
+          <button id="ehBtn" class="bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white font-bold px-6 py-2.5 rounded-xl text-sm"></button>
+          <button id="ehSample" class="bg-gray-800 hover:bg-gray-700 text-white font-bold px-5 py-2.5 rounded-xl text-sm"></button>
+        </div>
+        <div id="ehOut" class="hidden mt-5 space-y-4"></div>
+      </div>
+    `);
+
+    function applyLang() {
+      const t = TXT[L()];
+      const ehTitleEl = document.getElementById('ehTitle');
+      const ehSubEl = document.getElementById('ehSub');
+      const ehInputEl = document.getElementById('ehInput');
+      const ehBtnEl = document.getElementById('ehBtn');
+      const ehSampleEl = document.getElementById('ehSample');
+      if (ehTitleEl) ehTitleEl.innerText = t.title;
+      if (ehSubEl) ehSubEl.innerText = t.sub;
+      if (ehInputEl) ehInputEl.placeholder = t.ph;
+      if (ehBtnEl) ehBtnEl.innerText = t.btn;
+      if (ehSampleEl) ehSampleEl.innerText = t.sample;
+    }
+    applyLang();
+    const sel = document.getElementById('langSelector'); if (sel) sel.addEventListener('change', applyLang);
+
+    const chip = (label, v) => {
+      const good = v === 'pass', bad = v === 'fail' || v === 'softfail', c = !v ? 'text-gray-400 border-gray-700 bg-gray-800/50' : good ? 'text-emerald-300 border-emerald-500/30 bg-emerald-500/10' : bad ? 'text-red-300 border-red-500/30 bg-red-500/10' : 'text-amber-300 border-amber-500/30 bg-amber-500/10';
+      return `<span class="text-xs font-bold px-3 py-1.5 rounded-lg border ${c}">${label}: ${esc(v || '—')}</span>`;
+    };
+
+    function show() {
+      const t = TXT[L()], out = document.getElementById('ehOut'), raw = document.getElementById('ehInput').value;
+      if (!raw.trim()) { alert(t.empty); return; }
+      const r = analyze(raw);
+      if (!r) { out.innerHTML = `<div class="text-sm text-red-300">${t.none}</div>`; out.classList.remove('hidden'); return; }
+      const lvl = r.score >= 50 ? 2 : r.score >= 20 ? 1 : 0;
+      const pal = ['text-emerald-300 border-emerald-500/30 bg-emerald-500/10', 'text-amber-300 border-amber-500/30 bg-amber-500/10', 'text-red-300 border-red-500/30 bg-red-500/10'][lvl];
+      const row = (k, v) => `<tr class="border-t border-gray-800"><td class="py-1.5 pe-3 text-gray-500">${k}</td><td dir="ltr" class="font-mono text-gray-200 break-all">${esc(v || t.na)}</td></tr>`;
+      const list = r.findings.length
+        ? r.findings.slice().sort((a, b) => b.w - a.w).map(f => `<li class="flex gap-2.5 p-3 rounded-xl border text-xs ${f.w >= 25 ? 'text-red-200 bg-red-950/30 border-red-500/20' : 'text-amber-200 bg-amber-950/30 border-amber-500/20'}"><span class="flex-grow">${esc(f.text)}</span><span class="font-bold opacity-70">+${f.w}</span></li>`).join('')
+        : `<li class="text-xs text-gray-300">${t.clean}</li>`;
+      out.innerHTML = `
+        <div class="p-4 rounded-2xl border font-black text-xl ${pal}">${t.risk[lvl]} · ${r.score}/100</div>
+        <div><div class="text-sm font-bold text-white mb-2">${t.auth}</div><div class="flex flex-wrap gap-2">${chip('SPF', r.auth.spf)}${chip('DKIM', r.auth.dkim)}${chip('DMARC', r.auth.dmarc)}</div></div>
+        <div><div class="text-sm font-bold text-white mb-2">${t.ident}</div><table class="w-full text-xs"><tbody>
+          ${row(t.from, r.ids.from)}${row(t.reply, r.ids.reply)}${row(t.ret, r.ids.ret)}${row(t.mid, r.ids.mid)}${row(t.origin, r.ids.origin)}</tbody></table></div>
+        <div><div class="text-sm font-bold text-white mb-2">${t.find}</div><ul class="space-y-2">${list}</ul></div>
+        <div class="text-[11px] text-gray-500">${t.note}</div>`;
+      out.classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    const ehBtnEl = document.getElementById('ehBtn');
+    if (ehBtnEl) ehBtnEl.addEventListener('click', show);
+    const ehSampleEl = document.getElementById('ehSample');
+    if (ehSampleEl) ehSampleEl.addEventListener('click', () => { document.getElementById('ehInput').value = SAMPLE; show(); });
+    window.__hdr = { analyze };
+    lucide.createIcons();
+  })();
+  </script>
+
+  <!-- 5. عدسة التقليد (Look-alike Lens) -->
+  <script>
+  (function () {
+    const L = () => ((document.documentElement.lang || 'ar') === 'ar' ? 'ar' : 'en');
+    const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+    const BRANDS = {
+      paypal:'paypal.com', google:'google.com', facebook:'facebook.com', instagram:'instagram.com', microsoft:'microsoft.com',
+      apple:'apple.com', amazon:'amazon.com', netflix:'netflix.com', whatsapp:'whatsapp.com', binance:'binance.com',
+      vodafone:'vodafone.com.eg', fawry:'fawry.com', instapay:'instapay.eg', telegram:'telegram.org', tiktok:'tiktok.com',
+      github:'github.com', youtube:'youtube.com', twitter:'twitter.com', linkedin:'linkedin.com', spotify:'spotify.com',
+      steam:'steampowered.com', discord:'discord.com'
+    };
+    const CONF = { 'а':'a','е':'e','о':'o','р':'p','с':'c','х':'x','у':'y','і':'i','ј':'j','ѕ':'s','ԁ':'d','һ':'h','ɡ':'g','ο':'o','ν':'v','ι':'i','ա':'u','ⅼ':'l','Ι':'I','ӏ':'l' };
+
+    function scriptOf(c) {
+      const cp = c.codePointAt(0);
+      if (cp >= 0x0400 && cp <= 0x04FF) return 'Cyrillic';
+      if (cp >= 0x0370 && cp <= 0x03FF) return 'Greek';
+      if (cp >= 0x0530 && cp <= 0x058F) return 'Armenian';
+      if (cp < 0x0250) return 'Latin';
+      return 'Other';
+    }
+
+    const TXT = {
+      ar: { title:'عدسة التقليد (Look-alike Lens)', sub:'بنقارن الرابط بالموقع الأصلي حرف بحرف عشان تشوف التقليد بعينك',
+        link:'الرابط ده', orig:'الأصلي', legendBad:'حرف مختلف', legendOk:'الحرف الأصلي',
+        msg:(a,b,n)=>`الجزء «${a}» بيقلّد «${b}» — الفرق ${n} حرف بس.`,
+        home:'حروف مموّهة (Homoglyphs):', ch:'الحرف', code:'الكود', like:'بيشبه', script:'الكتابة',
+        scripts:{ Cyrillic:'سيريلي (روسي)', Greek:'يوناني', Armenian:'أرميني', Latin:'لاتيني', Other:'أخرى' },
+        real:'الدومين الرسمي:' },
+      en: { title:'Look-alike Lens', sub:'We compare the link with the real site character by character so you can see the imitation',
+        link:'This link', orig:'Original', legendBad:'Different character', legendOk:'Original character',
+        msg:(a,b,n)=>`"${a}" imitates "${b}" — only ${n} character${n > 1 ? 's' : ''} apart.`,
+        home:'Look-alike characters (homoglyphs):', ch:'Char', code:'Code', like:'Looks like', script:'Script',
+        scripts:{ Cyrillic:'Cyrillic', Greek:'Greek', Armenian:'Armenian', Latin:'Latin', Other:'Other' },
+        real:'Official domain:' }
+    };
+
+    function puny(input) {
+      const base = 36, tMin = 1, tMax = 26, skew = 38, damp = 700; let n = 128, i = 0, bias = 72;
+      const out = []; let b = input.lastIndexOf('-'); if (b < 0) b = 0;
+      for (let j = 0; j < b; j++) out.push(input.charCodeAt(j));
+      const adapt = (d, np, first) => { let k = 0; d = first ? Math.floor(d / damp) : d >> 1; d += Math.floor(d / np);
+        for (; d > ((base - tMin) * tMax) >> 1; k += base) d = Math.floor(d / (base - tMin)); return Math.floor(k + (base - tMin + 1) * d / (d + skew)); };
+      for (let idx = b > 0 ? b + 1 : 0; idx < input.length;) {
+        const oldi = i; let w = 1;
+        for (let k = base; ; k += base) {
+          const c = input.charCodeAt(idx++); const digit = c - 48 < 10 ? c - 22 : c - 65 < 26 ? c - 65 : c - 97 < 26 ? c - 97 : base;
+          i += digit * w; const t = k <= bias ? tMin : k >= bias + tMax ? tMax : k - bias; if (digit < t) break; w *= base - t;
+        }
+        const len = out.length + 1; bias = adapt(i - oldi, len, oldi === 0); n += Math.floor(i / len); i %= len; out.splice(i++, 0, n);
+      }
+      return String.fromCodePoint(...out);
+    }
+    const unicodeHost = h => h.split('.').map(l => { try { return l.startsWith('xn--') ? puny(l.slice(4)) : l; } catch (e) { return l; } }).join('.');
+
+    function diff(a, b) {
+      const A = [...a], B = [...b], m = A.length, n = B.length;
+      const d = Array.from({ length: m + 1 }, (_, i) => [i, ...Array(n).fill(0)]);
+      for (let j = 1; j <= n; j++) d[0][j] = j;
+      for (let i = 1; i <= m; i++) for (let j = 1; j <= n; j++)
+        d[i][j] = Math.min(d[i-1][j] + 1, d[i][j-1] + 1, d[i-1][j-1] + (A[i-1] === B[j-1] ? 0 : 1));
+      const ra = [], rb = []; let i = m, j = n;
+      while (i > 0 || j > 0) {
+        if (i > 0 && j > 0 && d[i][j] === d[i-1][j-1] + (A[i-1] === B[j-1] ? 0 : 1)) {
+          const same = A[i-1] === B[j-1]; ra.unshift([A[i-1], !same]); rb.unshift([B[j-1], !same]); i--; j--;
+        } else if (i > 0 && d[i][j] === d[i-1][j] + 1) { ra.unshift([A[i-1], true]); i--; }
+        else { rb.unshift([B[j-1], true]); j--; }
+      }
+      return { dist: d[m][n], ra, rb };
+    }
+    const norm = s => [...s].map(c => CONF[c] || c).join('');
+
+    function analyze(rawInput, urlObj) {
+      let host = (rawInput || '').trim().toLowerCase().replace(/^[a-z]+:\/\//, '').replace(/^[^\/?#]*@/, '').split(/[\/?#:]/)[0];
+      if (!host) host = urlObj.hostname.toLowerCase();
+      host = unicodeHost(host.replace(/^www\./, ''));
+      const labels = host.split('.');
+      const sldIdx = labels.length >= 3 && labels[labels.length - 1].length === 2 && ['co','com','org','net','gov','edu','ac'].includes(labels[labels.length - 2]) ? labels.length - 3 : labels.length - 2;
+      const parts = new Set();
+      if (sldIdx >= 0) { const sld = labels[sldIdx]; parts.add(sld); sld.split('-').forEach(p => p && parts.add(p)); }
+      labels.forEach(l => l.split('-').forEach(p => p && parts.add(p)));
+
+      let best = null;
+      for (const p of parts) {
+        if ([...p].length < 4) continue;
+        for (const [brand, real] of Object.entries(BRANDS)) {
+          if (labels.join('.') === real || host.endsWith('.' + real)) return { official: true };
+          const hasConf = [...p].some(c => CONF[c]);
+          const dRaw = diff(p, brand);
+          const d = dRaw.dist;
+          const lenOk = Math.abs([...p].length - brand.length) <= 2;
+          const ok = (d > 0 && d <= 2 && lenOk) || (hasConf && norm(p) === brand);
+          const rn = p.replace(/rn/g, 'm').replace(/0/g, 'o').replace(/1/g, 'l').replace(/3/g, 'e').replace(/5/g, 's');
+          const okRn = p !== brand && rn === brand;
+          if (ok || okRn) {
+            const df = okRn && !ok ? diff(p, brand) : dRaw;
+            if (!best || df.dist < best.df.dist) best = { part: p, brand, real, df };
+          }
+        }
+      }
+      if (best && best.df.dist === 0) return null;
+      const hom = [...host].filter(c => CONF[c] || /[^\x00-\x7F]/.test(c)).filter((c, i, a) => a.indexOf(c) === i);
+      return best ? { best, hom } : (hom.length ? { best: null, hom } : null);
+    }
+
+    const card = document.createElement('div');
+    card.id = 'lensCard';
+    card.className = 'hidden glass-card p-6 sm:p-7 rounded-3xl border border-fuchsia-500/20 mb-8';
+    extraToolsContainer.appendChild(card);
+
+    const line = (arr, bad) => arr.map(([c, x]) => x ? `<span class="${bad ? 'bg-red-500/30 text-red-200' : 'bg-emerald-500/30 text-emerald-200'} rounded px-0.5 font-bold">${esc(c)}</span>` : esc(c)).join('');
+
+    function render(res) {
+      const t = TXT[L()];
+      if (!res || res.official || (!res.best && !res.hom.length)) { card.classList.add('hidden'); return; }
+      let html = `<div class="flex items-center gap-3 mb-4"><div class="p-2 bg-fuchsia-500/10 rounded-xl text-fuchsia-400"><i data-lucide="scan-search" class="w-5 h-5"></i></div>
+        <div><h3 class="text-lg font-bold text-white">${t.title}</h3><p class="text-xs text-gray-400">${t.sub}</p></div></div>`;
+      if (res.best) {
+        const b = res.best;
+        html += `<div dir="ltr" class="bg-gray-950/80 border border-gray-800 rounded-2xl p-4 font-mono text-lg space-y-2">
+            <div><span class="text-[11px] text-gray-500 inline-block w-24 font-sans">${t.link}</span>${line(b.df.ra, true)}</div>
+            <div><span class="text-[11px] text-gray-500 inline-block w-24 font-sans">${t.orig}</span>${line(b.df.rb, false)}</div></div>
+          <div class="flex gap-4 text-[11px] text-gray-400 mt-2"><span class="text-red-300">● ${t.legendBad}</span><span class="text-emerald-300">● ${t.legendOk}</span></div>
+          <div class="mt-3 text-sm text-fuchsia-200">${esc(t.msg(b.part, b.brand, b.df.dist))}</div>
+          <div class="text-xs text-gray-400 mt-1">${t.real} <span dir="ltr" class="font-mono text-emerald-300">${esc(b.real)}</span></div>`;
+      }
+      if (res.hom.length) {
+        html += `<div class="mt-4 text-sm font-bold text-white">${t.home}</div>
+          <div class="mt-2 overflow-x-auto"><table class="w-full text-xs text-gray-300"><thead><tr class="text-gray-500 text-start">
+            <th class="py-1 text-start">${t.ch}</th><th class="text-start">${t.code}</th><th class="text-start">${t.like}</th><th class="text-start">${t.script}</th></tr></thead><tbody>
+          ${res.hom.map(c => `<tr class="border-t border-gray-800"><td class="py-1.5 text-lg text-red-300">${esc(c)}</td>
+            <td dir="ltr" class="font-mono">U+${c.codePointAt(0).toString(16).toUpperCase().padStart(4, '0')}</td>
+            <td dir="ltr" class="font-mono">${CONF[c] ? esc(CONF[c]) : '—'}</td><td>${t.scripts[scriptOf(c)]}</td></tr>`).join('')}
+          </tbody></table></div>`;
+      }
+      card.innerHTML = html;
+      card.classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    const origRender = renderScanOutput;
+    renderScanOutput = function (urlObj, heuristics, aiText) {
+      origRender(urlObj, heuristics, aiText);
+      try { render(analyze(document.getElementById('urlInput').value, urlObj)); } catch (e) { card.classList.add('hidden'); }
+    };
+    window.__lookalike = { analyze, puny };
+  })();
+  </script>
+
+  <!-- 7. تحدي اصطياد التصيّد (Phishing Trainer) -->
+  <script>
+  (function () {
+    const L = () => ((document.documentElement.lang || 'ar') === 'ar' ? 'ar' : 'en');
+    const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const ROUND = 8;
+
+    const ITEMS = [
+      { u:'https://accounts.google.com/signin', phish:false,
+        ar:'سب-دومين رسمي تابع لـ google.com — الدومين الحقيقي هو الجزء قبل .com مباشرة.',
+        en:'An official subdomain of google.com — the real domain is the part right before .com.' },
+      { u:'https://www.paypal.com/signin', phish:false,
+        ar:'الدومين الحقيقي paypal.com بدون أي إضافات مريبة، ومشفّر HTTPS.',
+        en:'The real domain is paypal.com with nothing suspicious added, over HTTPS.' },
+      { u:'https://github.com/login', phish:false,
+        ar:'دومين رسمي، وكلمة login في المسار طبيعية على موقع حقيقي.',
+        en:'Official domain; "login" in the path is normal on a genuine site.' },
+      { u:'https://www.amazon.com/gp/css/order-history', phish:false,
+        ar:'الدومين الحقيقي amazon.com، والمسار مجرد صفحة داخل الموقع.',
+        en:'The real domain is amazon.com; the path is just a page inside the site.' },
+      { u:'https://www.instagram.com/accounts/login/', phish:false,
+        ar:'دومين رسمي ومشفّر، ومفيش تقليد في الاسم.',
+        en:'Official, encrypted domain with no name imitation.' },
+      { u:'https://www.vodafone.com.eg', phish:false,
+        ar:'دومين فودافون المصري الرسمي (vodafone.com.eg).',
+        en:'Vodafone Egypt’s official domain (vodafone.com.eg).' },
+      { u:'https://paypa1-secure-login.xyz/verify', phish:true,
+        ar:'الاسم «paypa1» بالرقم 1 بدل حرف l، وامتداد .xyz، وكلمات secure/login/verify — كلها علامات تصيّد.',
+        en:'"paypa1" uses the digit 1 instead of l, a .xyz TLD, and secure/login/verify keywords — classic phishing.' },
+      { u:'https://www.google.com@secure-update.top/login', phish:true,
+        ar:'علامة @ بتخلّي اللي قبلها تمويه. الوجهة الحقيقية هي secure-update.top.',
+        en:'The "@" makes everything before it a decoy. The real destination is secure-update.top.' },
+      { u:'https://xn--pypal-4ve.com/signin', phish:true,
+        ar:'الدومين مكتوب بـ Punycode (xn--) لتقليد حروف تشبه paypal بحرف غير لاتيني.',
+        en:'Punycode (xn--) domain mimicking "paypal" with a look-alike non-Latin character.' },
+      { u:'https://facebook.com.account-verify.click/recover', phish:true,
+        ar:'facebook.com هنا مجرد سب-دومين. الدومين الحقيقي account-verify.click.',
+        en:'"facebook.com" is only a subdomain here. The real domain is account-verify.click.' },
+      { u:'http://45.12.33.7/bank/login', phish:true,
+        ar:'عنوان IP مباشر بدل اسم بنك، وغير مشفّر HTTP.',
+        en:'A raw IP address instead of a bank name, and unencrypted HTTP.' },
+      { u:'https://amazon-order-confirm.work/billing', phish:true,
+        ar:'اسم أمازون مستخدم داخل دومين تاني بامتداد .work مع كلمة billing.',
+        en:'Amazon’s name inside a different .work domain with "billing".' },
+      { u:'https://rnicrosoft.com/account', phish:true,
+        ar:'«rn» متجاورين بيشبهوا حرف m — انتحال شهير لـ microsoft.',
+        en:'"rn" side by side looks like "m" — a famous microsoft impersonation.' },
+      { u:'https://vodafone-cash-prize.buzz/claim?redirect=https://example.org', phish:true,
+        ar:'اسم فودافون + كلمة prize + امتداد .buzz + باراميتر تحويل لرابط تاني.',
+        en:'Vodafone’s name + "prize" + .buzz TLD + a redirect parameter.' }
+    ];
+
+    const TXT = {
+      ar: { title:'تحدي اصطياد التصيّد', sub:'درّب نفسك: هل الرابط ده آمن ولا تصيّد؟ بعد كل إجابة هتشوف التشريح وليه.',
+        start:'ابدأ التحدي', safe:'آمن', phish:'تصيّد', next:'التالي', finish:'شوف النتيجة', again:'جولة جديدة',
+        q:'سؤال', of:'من', ok:'إجابة صحيحة ✅', no:'إجابة غلط ❌', score:'نتيجتك', why:'ليه؟',
+        lv:['مبتدئ — لسه محتاج تتدرب','متوسط — عينك بدأت تتعود','محترف — صعب حد يخدعك'], eng:'تحليل المحرك:' },
+      en: { title:'Phishing Hunt Challenge', sub:'Train yourself: is this link safe or phishing? After each answer you will see the breakdown and why.',
+        start:'Start challenge', safe:'Safe', phish:'Phishing', next:'Next', finish:'See result', again:'New round',
+        q:'Question', of:'of', ok:'Correct ✅', no:'Wrong ❌', score:'Your score', why:'Why?',
+        lv:['Beginner — keep practicing','Intermediate — your eye is getting trained','Expert — hard to fool'], eng:'Engine analysis:' }
+    };
+
+    const card = document.createElement('div');
+    card.className = 'glass-card p-6 sm:p-7 rounded-3xl border border-pink-500/20 mb-8';
+    card.innerHTML = `
+      <div class="flex items-center gap-3 mb-4">
+        <div class="p-2 bg-pink-500/10 rounded-xl text-pink-400"><i data-lucide="gamepad-2" class="w-5 h-5"></i></div>
+        <div><h3 id="trTitle" class="text-lg font-bold text-white"></h3><p id="trSub" class="text-xs text-gray-400"></p></div>
+      </div>
+      <div id="trBody"></div>`;
+    extraToolsContainer.appendChild(card);
+
+    let deck = [], idx = 0, score = 0, answered = false;
+    const body = () => document.getElementById('trBody');
+
+    function head() {
+      const t = TXT[L()];
+      const trTitleEl = document.getElementById('trTitle');
+      const trSubEl = document.getElementById('trSub');
+      if (trTitleEl) trTitleEl.innerText = t.title;
+      if (trSubEl) trSubEl.innerText = t.sub;
+    }
+    function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+
+    function renderStart() {
+      head();
+      const bObj = body();
+      if (!bObj) return;
+      bObj.innerHTML = `<button id="trStart" class="bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 text-white font-bold px-6 py-2.5 rounded-xl text-sm">${TXT[L()].start}</button>`;
+      document.getElementById('trStart').onclick = () => {
+        const ph = shuffle(ITEMS.filter(i => i.phish)).slice(0, ROUND / 2);
+        const sf = shuffle(ITEMS.filter(i => !i.phish)).slice(0, ROUND / 2);
+        deck = shuffle(ph.concat(sf)); idx = 0; score = 0; renderQ();
+      };
+    }
+
+    function renderQ() {
+      const t = TXT[L()], it = deck[idx]; answered = false; head();
+      const bObj = body();
+      if (!bObj) return;
+      bObj.innerHTML = `
+        <div class="text-xs text-gray-400 mb-2">${t.q} ${idx + 1} ${t.of} ${deck.length} · ${t.score}: ${score}</div>
+        <div dir="ltr" class="font-mono text-sm break-all bg-gray-950/80 border border-gray-800 rounded-2xl p-4 mb-3">${esc(it.u)}</div>
+        <div class="flex gap-3" id="trBtns">
+          <button data-a="safe" class="flex-1 bg-emerald-600/20 hover:bg-emerald-600/40 border border-emerald-500/40 text-emerald-300 font-bold py-2.5 rounded-xl text-sm">${t.safe}</button>
+          <button data-a="phish" class="flex-1 bg-red-600/20 hover:bg-red-600/40 border border-red-500/40 text-red-300 font-bold py-2.5 rounded-xl text-sm">${t.phish}</button>
+        </div>
+        <div id="trFeedback" class="mt-4"></div>`;
+      document.querySelectorAll('#trBtns button').forEach(b => b.onclick = () => answer(b.dataset.a === 'phish'));
+    }
+
+    function answer(saidPhish) {
+      if (answered) return; answered = true;
+      const t = TXT[L()], it = deck[idx], right = saidPhish === it.phish;
+      if (right) score++;
+
+      let engine = '';
+      if (typeof runDeceptionDNA === 'function') {
+        try {
+          const dna = runDeceptionDNA(new URL(it.u), it.u);
+          const rows = dna.sigs.slice().sort((a, b) => b.w - a.w).map(s => `<li class="text-xs text-amber-200">• ${esc(s.text)}</li>`).join('');
+          engine = `<div class="mt-2 text-xs text-gray-400">${t.eng} <span class="font-bold text-gray-200">${dna.score}/100</span></div><ul class="mt-1 space-y-1">${rows}</ul>`;
+        } catch (e) {}
+      }
+      const last = idx === deck.length - 1;
+      const fbEl = document.getElementById('trFeedback');
+      if (fbEl) {
+        fbEl.innerHTML = `
+          <div class="p-4 rounded-2xl border ${right ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-200' : 'border-red-500/30 bg-red-500/10 text-red-200'}">
+            <div class="font-bold text-sm mb-1">${right ? t.ok : t.no} — ${it.phish ? t.phish : t.safe}</div>
+            <div class="text-xs"><strong>${t.why}</strong> ${esc(it[L()])}</div>${engine}
+          </div>
+          <button id="trNext" class="mt-3 bg-gray-800 hover:bg-gray-700 text-white font-bold px-5 py-2 rounded-xl text-sm">${last ? t.finish : t.next}</button>`;
+        const trNextEl = document.getElementById('trNext');
+        if (trNextEl) trNextEl.onclick = () => { idx++; if (idx < deck.length) renderQ(); else renderEnd(); };
+      }
+      lucide.createIcons();
+    }
+
+    function renderEnd() {
+      const t = TXT[L()], r = score / deck.length, lvl = r >= 0.85 ? 2 : r >= 0.55 ? 1 : 0;
+      const bObj = body();
+      if (!bObj) return;
+      bObj.innerHTML = `
+        <div class="text-center p-6 rounded-2xl bg-gray-950/70 border border-gray-800">
+          <div class="text-xs text-gray-400">${t.score}</div>
+          <div class="text-4xl font-black text-white my-1">${score} / ${deck.length}</div>
+          <div class="text-sm text-pink-300">${t.lv[lvl]}</div>
+          <button id="trAgain" class="mt-4 bg-gradient-to-r from-pink-600 to-rose-600 text-white font-bold px-6 py-2.5 rounded-xl text-sm">${t.again}</button>
+        </div>`;
+      const trAgainEl = document.getElementById('trAgain');
+      if (trAgainEl) trAgainEl.onclick = renderStart;
+    }
+
+    renderStart();
+    const sel = document.getElementById('langSelector');
+    if (sel) sel.addEventListener('change', () => {
+      if (deck.length && idx < deck.length && !answered) renderQ();
+      else if (deck.length) head();
+      else renderStart();
+    });
+    lucide.createIcons();
+  })();
+  </script>
+  <script>
+(function () {
+  const L = () => ((document.documentElement.lang || 'ar') === 'ar' ? 'ar' : 'en');
+  const $ = id => document.getElementById(id);
+  const card = id => { const e = $(id); return e ? (e.closest ? (e.closest('.glass-card') || e) : e) : null; };
+  const visible = el => !!el && (el.getClientRects ? el.getClientRects().length > 0 : true);
+  const DEMO_URL = 'https://paypa1-secure-login.xyz/verify';
+
+  // key: معرّف | get: بيرجّع عنصر الميزة (أو null لو الميزة مش متركّبة) | post: بتظهر بعد أول فحص
+  const ITEMS = [
+    { key:'link', icon:'link-2', get:() => card('urlInput'),
+      ar:{ n:'فحص رابط', w:'الصق أي رابط وشوف هو آمن ولا لأ.', s:['اكتب أو الصق الرابط في الخانة الرئيسية.','اضغط «فحص ذكي شامل».','هتظهر درجة الخطورة وتحتها كل التفاصيل.'] },
+      en:{ n:'Scan a link', w:'Paste any link and see whether it is safe.', s:['Type or paste the link in the main box.','Press “Comprehensive AI Scan”.','You get a threat score with full details below.'] } },
+    { key:'upload', icon:'paperclip', get:() => $('uploadFileBtn'),
+      ar:{ n:'رفع ملف', w:'ارفع ملف بدل الرابط، والنظام يختار الأداة المناسبة.', s:['اضغط زر «رفع ملف» أو اسحب الملف على كارت الفحص.','ملف .eml يروح لمحلل الإيميل، وصورة QR لدرع الـ QR، وأي ملف تاني لفحص الملفات.','الملف بيتحلل في متصفحك ومبيتبعتش لأي مكان.'] },
+      en:{ n:'Upload a file', w:'Upload a file instead of a link; the right tool is picked for you.', s:['Press “Upload file” or drag the file onto the scan card.','.eml goes to the email analyzer, QR images to QR Shield, anything else to file triage.','The file is analyzed in your browser and never uploaded.'] } },
+    { key:'radar', icon:'radar', get:() => card('radarTitle'),
+      ar:{ n:'رادار الرسايل', w:'بيكشف أساليب الخداع النفسي في الرسالة نفسها.', s:['الصق رسالة واتساب أو SMS أو إيميل في المربع.','اضغط «حلّل الرسالة».','هتشوف أساليب التلاعب مظلّلة، والروابط اللي جوه الرسالة.'] },
+      en:{ n:'Message Radar', w:'Detects psychological tricks inside the message itself.', s:['Paste a WhatsApp, SMS or email message in the box.','Press “Analyze message”.','See highlighted manipulation tactics and the links inside.'] } },
+    { key:'qr', icon:'qr-code', get:() => card('qrTitle'),
+      ar:{ n:'درع الـ QR', w:'بيفك صورة QR ويحلل اللي جواها قبل ما تفتحه.', s:['ارفع صورة QR أو اسحبها أو الصقها بـ Ctrl+V.','هنفك الكود ونعرض نوعه ومحتواه.','لو رابط، اضغط «افحصه بالفحص الشامل».'] },
+      en:{ n:'QR Shield', w:'Decodes a QR image and analyzes it before you open it.', s:['Upload, drag or paste (Ctrl+V) a QR image.','We decode it and show its type and content.','If it is a link, press “Run full scan on it”.'] } },
+    { key:'email', icon:'mail-warning', get:() => card('ehTitle'),
+      ar:{ n:'محلل ترويسة الإيميل', w:'بيكشف لو المرسل مزوّر من غير ما تفتح أي لينك.', s:['في Gmail: افتح الإيميل ثم ⋮ ثم «Show original».','انسخ الترويسة والصقها في المربع، أو ارفع ملف .eml.','اضغط «حلّل الترويسة»، أو «جرّب مثال» تشوف الشكل.'] },
+      en:{ n:'Email Header Forensics', w:'Detects a spoofed sender without opening any link.', s:['In Gmail: open the email, then ⋮, then “Show original”.','Copy the headers into the box, or upload an .eml file.','Press “Analyze headers”, or “Try an example”.'] } },
+    { key:'file', icon:'file-search', get:() => card('ftTitle'),
+      ar:{ n:'فحص الملفات الخصوصي', w:'تحليل ملف جوه متصفحك من غير رفعه لأي سيرفر.', s:['اسحب الملف على الخانة أو اضغط لاختياره.','هتشوف النوع الحقيقي والبصمة ومؤشرات الاشتباه.','تنبيه: ده فحص أولي ومش بديل للـ Antivirus.'] },
+      en:{ n:'Private File Triage', w:'Analyze a file inside your browser without uploading it.', s:['Drag a file onto the box or click to choose.','See its real type, fingerprint and suspicion indicators.','Note: a quick triage, not an antivirus replacement.'] } },
+    { key:'trainer', icon:'gamepad-2', get:() => card('trTitle'),
+      ar:{ n:'تحدي اصطياد التصيّد', w:'لعبة تدرّبك تكتشف الروابط المزيفة بنفسك.', s:['اضغط «ابدأ التحدي».','اختار «آمن» أو «تصيّد» لكل رابط.','بعد كل إجابة هتشوف السبب وتحليل المحرك.'] },
+      en:{ n:'Phishing Hunt Challenge', w:'A game that trains you to spot fake links yourself.', s:['Press “Start challenge”.','Choose “Safe” or “Phishing” for each link.','After each answer see the reason and engine analysis.'] } },
+    { key:'dna', icon:'dna', post:true, get:() => $('dnaCard'),
+      ar:{ n:'تشريح الرابط', w:'يقسّم الرابط لأجزاء ويوريك المريب فيه.', s:['بيظهر بعد أي فحص رابط.','الأحمر جزء مريب، والأخضر الدومين الحقيقي.','كل مؤشر تحت الرابط وزنه جنبه.'] },
+      en:{ n:'Deception DNA', w:'Splits the link into parts and shows what is suspicious.', s:['Appears after any link scan.','Red is a suspicious part, green is the real domain.','Each indicator below shows its weight.'] } },
+    { key:'lens', icon:'scan-search', post:true, get:() => $('lensCard'),
+      ar:{ n:'عدسة التقليد', w:'بتقارن الرابط بالموقع الأصلي حرف بحرف.', s:['بتظهر بس لو الرابط بيقلّد موقع معروف.','الحروف المختلفة متظلّلة بالأحمر جنب الأصلي.','جدول الحروف المموّهة بيكشف الحروف السيريلي واليوناني.'] },
+      en:{ n:'Look-alike Lens', w:'Compares the link with the real site character by character.', s:['Shows only when the link imitates a known site.','Different characters are highlighted red next to the original.','The homoglyph table reveals Cyrillic/Greek look-alikes.'] } },
+    { key:'kit', icon:'file-warning', post:true, get:() => $('kitCard'),
+      ar:{ n:'عدة البلاغ', w:'رابط آمن للمشاركة ونص بلاغ جاهز وتقرير دليل.', s:['بتظهر بعد الفحص تحت النتيجة.','انسخ النسخة الآمنة من الرابط قبل ما تبعته لحد.','انسخ نص البلاغ أو نزّل التقرير وابعته للجهة المعنية.'] },
+      en:{ n:'Incident Kit', w:'A safe-to-share link, a ready report and an evidence file.', s:['Appears under the result after a scan.','Copy the safe version of the link before sharing it.','Copy the report text or download the evidence report.'] } }
+  ];
+
+  const TXT = {
+    ar: { aria:'دليل الاستخدام', title:'دليل الاستخدام', close:'إغلاق', hello:'أهلًا! اختار ميزة تتعرف عليها، أو ابدأ جولة سريعة.', tour:'ابدأ جولة سريعة',
+      back:'رجوع', go:'وديني هناك', demo:'جرّب رابط تجريبي', step:'خطوة', of:'من', prev:'السابق', next:'التالي', done:'تمام، خلصنا',
+      later:'الميزة دي بتظهر بعد أول فحص. اضغط «جرّب رابط تجريبي» وهتشوفها.', how:'إزاي تستخدمها', bubble:'محتاج مساعدة؟', fin:'جولة انتهت! جرّب أي ميزة بنفسك.',
+      none:'مفيش ميزات متاحة للشرح.' },
+    en: { aria:'User guide', title:'User guide', close:'Close', hello:'Hi! Pick a feature to learn about, or start a quick tour.', tour:'Start quick tour',
+      back:'Back', go:'Take me there', demo:'Try a demo link', step:'Step', of:'of', prev:'Previous', next:'Next', done:'Done',
+      later:'This feature appears after your first scan. Press “Try a demo link” to see it.', how:'How to use it', bubble:'Need help?', fin:'Tour finished! Try any feature yourself.',
+      none:'No features available to explain.' }
+  };
+
+  // ---- ستايل بسيط للأنيميشن ----
+  const st = document.createElement('style');
+  st.textContent = '.guide-pulse{outline:3px solid #818cf8!important;outline-offset:6px;animation:guidePulse 1.2s ease-in-out 3}' +
+    '@keyframes guidePulse{0%,100%{outline-color:#818cf8}50%{outline-color:#22d3ee}}' +
+    '.guide-ring{animation:guideRing 2s infinite}@keyframes guideRing{0%{box-shadow:0 0 0 0 rgba(99,102,241,.6)}100%{box-shadow:0 0 0 18px rgba(99,102,241,0)}}';
+  document.head.appendChild(st);
+
+  // ---- الزرار الدايري ----
+  let seen = false; try { seen = localStorage.getItem('checklink_guide_seen') === '1'; } catch (e) {}
+  const fab = document.createElement('button');
+  fab.id = 'guideFab'; fab.type = 'button';
+  fab.className = 'rounded-full text-white shadow-xl shadow-indigo-600/40 flex items-center justify-center bg-gradient-to-tr from-indigo-600 to-cyan-500 hover:scale-105 transition-transform' + (seen ? '' : ' guide-ring');
+  fab.setAttribute('style', 'position:fixed;width:56px;height:56px;z-index:60;bottom:calc(16px + env(safe-area-inset-bottom,0px));inset-inline-end:16px');
+  fab.innerHTML = '<i data-lucide="life-buoy" class="w-6 h-6"></i>';
+  document.body.appendChild(fab);
+
+  const bubble = document.createElement('div');
+  bubble.id = 'guideBubble';
+  bubble.className = 'glass-card text-xs text-gray-100 px-3 py-2 rounded-xl shadow-lg';
+  bubble.setAttribute('style', 'position:fixed;z-index:60;bottom:calc(30px + env(safe-area-inset-bottom,0px));inset-inline-end:84px');
+  if (!seen) document.body.appendChild(bubble);
+
+  // ---- اللوحة ----
+  const panel = document.createElement('div');
+  panel.id = 'guidePanel';
+  panel.setAttribute('role', 'dialog');
+  panel.className = 'glass-card rounded-3xl shadow-2xl border border-indigo-500/30 hidden';
+  panel.setAttribute('style', 'position:fixed;z-index:60;width:min(380px,calc(100vw - 32px));max-height:68vh;overflow-y:auto;bottom:calc(84px + env(safe-area-inset-bottom,0px));inset-inline-end:16px;background:rgba(10,15,30,.96)');
+  document.body.appendChild(panel);
+
+  let view = 'home', cur = null, tourList = [], tourIdx = 0, pulsed = null;
+  const avail = () => ITEMS.filter(i => !!i.get());
+  const tt = () => TXT[L()];
+
+  function unpulse() { if (pulsed && pulsed.classList) pulsed.classList.remove('guide-pulse'); pulsed = null; }
+  function focusItem(it) {
+    unpulse();
+    let el = it.get();
+    if (!visible(el)) el = card('urlInput');          // الميزة لسه مخفية: نوقف عند خانة الفحص
+    if (!el) return;
+    if (el.scrollIntoView) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    el.classList.add('guide-pulse'); pulsed = el;
+    setTimeout(() => { if (pulsed === el) unpulse(); }, 3800);
+  }
+  async function demo() {
+    const inp = $('urlInput'); if (!inp) return;
+    inp.value = DEMO_URL;
+    try { if (typeof runComprehensiveScan === 'function') await runComprehensiveScan(); } catch (e) {}
+    const r = $('resultsSection'); if (r && r.scrollIntoView) r.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (view === 'detail' || view === 'tour') render();
+  }
+
+  const head = (t, backBtn) => `<div class="flex items-center justify-between gap-2 p-4 pb-2 sticky top-0" style="background:rgba(10,15,30,.98)">
+      <div class="flex items-center gap-2 min-w-0">${backBtn ? `<button data-act="home" class="text-xs text-indigo-300 hover:text-white shrink-0">‹ ${t.back}</button>` : ''}
+      <span class="font-bold text-white truncate">${t.title}</span></div>
+      <button data-act="close" aria-label="${t.close}" class="text-gray-400 hover:text-white text-lg leading-none px-1">✕</button></div>`;
+
+  function stepsHtml(d, t) { return `<div class="text-xs font-bold text-indigo-300 mb-2">${t.how}</div><ol class="space-y-2">${d.s.map((x, i) => `<li class="flex gap-2.5 text-sm text-gray-200"><span class="shrink-0 w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-300 text-[11px] font-bold flex items-center justify-center">${i + 1}</span><span>${x}</span></li>`).join('')}</ol>`; }
+  function laterHtml(it, t) { return it.post && !visible(it.get()) ? `<div class="mt-3 text-xs text-amber-200 bg-amber-950/30 border border-amber-500/20 rounded-xl p-3">${t.later}</div>` : ''; }
+  function actionsHtml(it, t, extra) {
+    const needDemo = it.post && !visible(it.get());
+    return `<div class="flex flex-wrap gap-2 mt-4">${extra || ''}
+      ${needDemo ? `<button data-act="demo" class="bg-gradient-to-r from-indigo-600 to-cyan-600 text-white text-xs font-bold px-4 py-2 rounded-xl">${t.demo}</button>`
+        : `<button data-act="go" class="bg-gray-800 hover:bg-gray-700 text-white text-xs font-bold px-4 py-2 rounded-xl">${t.go}</button>`}</div>`;
+  }
+
+  function render() {
+    const t = tt(), L2 = L(), list = avail();
+    if (view === 'home') {
+      panel.innerHTML = head(t, false) + `<div class="p-4 pt-2">
+        <p class="text-sm text-gray-300 mb-3">${t.hello}</p>
+        ${list.length ? `<button data-act="tour" class="w-full bg-gradient-to-r from-indigo-600 to-cyan-600 text-white font-bold text-sm py-2.5 rounded-xl mb-3">▶ ${t.tour}</button>` : `<p class="text-xs text-gray-400">${t.none}</p>`}
+        <div class="space-y-2">${list.map(i => `<button data-act="item" data-key="${i.key}" class="w-full flex items-center gap-3 text-start bg-gray-950/70 hover:bg-gray-900 border border-gray-800 rounded-xl p-3">
+          <span class="p-2 rounded-lg bg-indigo-500/10 text-indigo-300 shrink-0"><i data-lucide="${i.icon}" class="w-4 h-4"></i></span>
+          <span class="min-w-0"><span class="block text-sm font-bold text-gray-100">${i[L2].n}</span><span class="block text-[11px] text-gray-400">${i[L2].w}</span></span></button>`).join('')}</div></div>`;
+    } else if (view === 'detail' && cur) {
+      const d = cur[L2];
+      panel.innerHTML = head(t, true) + `<div class="p-4 pt-2"><div class="text-lg font-black text-white mb-1">${d.n}</div><p class="text-sm text-gray-300 mb-3">${d.w}</p>${stepsHtml(d, t)}${laterHtml(cur, t)}${actionsHtml(cur, t)}</div>`;
+    } else if (view === 'tour') {
+      const it = tourList[tourIdx], d = it[L2], last = tourIdx === tourList.length - 1;
+      panel.innerHTML = head(t, false) + `<div class="p-4 pt-2"><div class="text-[11px] text-gray-500 mb-1">${t.step} ${tourIdx + 1} ${t.of} ${tourList.length}</div>
+        <div class="h-1 bg-gray-800 rounded-full mb-3 overflow-hidden"><div class="h-full bg-indigo-500" style="width:${Math.round((tourIdx + 1) / tourList.length * 100)}%"></div></div>
+        <div class="text-lg font-black text-white mb-1">${d.n}</div><p class="text-sm text-gray-300 mb-3">${d.w}</p>${stepsHtml(d, t)}${laterHtml(it, t)}
+        <div class="flex items-center justify-between gap-2 mt-4">
+          <button data-act="prev" class="text-xs font-bold px-4 py-2 rounded-xl bg-gray-800 text-white ${tourIdx === 0 ? 'opacity-40' : ''}">${t.prev}</button>
+          ${it.post && !visible(it.get()) ? `<button data-act="demo" class="text-xs font-bold px-3 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-600 text-white">${t.demo}</button>` : ''}
+          <button data-act="next" class="text-xs font-bold px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white">${last ? t.done : t.next}</button>
+        </div></div>`;
+    }
+    if (window.lucide) lucide.createIcons();
+  }
+
+  function open() {
+    view = 'home'; panel.classList.remove('hidden'); render();
+    bubble.remove && bubble.remove();
+    fab.classList.remove('guide-ring');
+    try { localStorage.setItem('checklink_guide_seen', '1'); } catch (e) {}
+  }
+  function close() { panel.classList.add('hidden'); unpulse(); }
+  function startTour() { tourList = avail(); tourIdx = 0; view = 'tour'; render(); if (tourList[0]) focusItem(tourList[0]); }
+  function step(delta) {
+    const n = tourIdx + delta;
+    if (n < 0) return;
+    if (n >= tourList.length) { view = 'home'; unpulse(); render(); return; }
+    tourIdx = n; render(); focusItem(tourList[tourIdx]);
+  }
+
+  panel.addEventListener('click', e => {
+    const b = e.target.closest ? e.target.closest('[data-act]') : null;
+    if (!b) return;
+    const a = b.getAttribute ? b.getAttribute('data-act') : b.dataset.act;
+    if (a === 'close') close();
+    else if (a === 'home') { view = 'home'; unpulse(); render(); }
+    else if (a === 'tour') startTour();
+    else if (a === 'item') { cur = ITEMS.find(i => i.key === b.getAttribute('data-key')); view = 'detail'; render(); }
+    else if (a === 'go' && cur) focusItem(cur);
+    else if (a === 'demo') demo();
+    else if (a === 'next') step(1);
+    else if (a === 'prev') step(-1);
+  });
+  fab.addEventListener('click', () => panel.classList.contains('hidden') ? open() : close());
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+
+  const sel = $('langSelector');
+  const applyLang = () => { fab.setAttribute('aria-label', tt().aria); panel.setAttribute('aria-label', tt().aria); bubble.innerText = tt().bubble; if (!panel.classList.contains('hidden')) render(); };
+  if (sel) sel.addEventListener('change', applyLang);
+  applyLang();
+  if (!seen) setTimeout(() => bubble.remove && bubble.remove(), 8000);
+
+  window.__guide = { open, close, startTour, step, items: () => avail().map(i => i.key), demo };
+  if (window.lucide) lucide.createIcons();
+})();
+</script>
+
+
+  <!-- 8. رادار الهندسة الاجتماعية (Social Radar) -->
+  <script>
+  (function () {
+    const L = () => ((document.documentElement.lang || 'ar') === 'ar' ? 'ar' : 'en');
+    const esc = s => s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+    const TACTICS = [
+      { id:'urgency', w:18, c:'amber', ar:'استعجال', en:'Urgency',
+        re:/فورا|فوراً|عاجل|خلال\s*\d+\s*(ساعة|ساعات|دقيقة|دقائق|يوم|أيام)|آخر فرصة|اخر فرصة|قبل انتهاء|سيتم إيقاف|حالا|الآن|حلو الحق|الحق|سرعة|سرعه|urgent|immediately|within\s*\d+\s*(hours?|minutes?|days?)|last chance|act now|final notice|expires?/gi },
+      { id:'fear', w:18, c:'red', ar:'تخويف', en:'Fear',
+        re:/تم\s*(إيقاف|ايقاف|تعليق|حظر|اختراق|قفل|تقفيل)|حسابك\s*(مهدد|معلق|موقوف|مغلق|مسروق)|مخالفة|غرامة|اتقفل|هيتقفل|هيتسرق|suspended|blocked|hacked|locked|unauthori[sz]ed|penalty|legal action|arrest/gi },
+      { id:'reward', w:15, c:'emerald', ar:'إغراء بجائزة', en:'Reward bait',
+        re:/مبروك|كسبت|ربحت|جائزة|هدية|مجانا|مجاناً|مجاني|سحب|مليون|جنية|جنيه|فلوس|هديه|congratulations|you won|prize|gift|free|cashback|reward/gi },
+      { id:'authority', w:10, c:'sky', ar:'انتحال جهة رسمية', en:'Authority claim',
+        re:/البنك|فودافون|اتصالات|أورنج|اورنج|الضرائب|النيابة|الشرطة|الدعم الفني|bank|support team|tax authority|police|customs|security team|official/gi },
+      { id:'credentials', w:25, c:'red', ar:'طلب بيانات حساسة', en:'Credential request',
+        re:/كلمة المرور|الباسورد|الرقم السري|كود التفعيل|رمز التحقق|رقم البطاقة|تأكيد البيانات|سجل|بيانات|البطاقة|فيزا|otp|cvv|password|\bpin\b|verification code|card number|confirm your (identity|details)/gi },
+      { id:'money', w:15, c:'amber', ar:'طلب فلوس', en:'Money request',
+        re:/تحويل|حوّل|حول لي|ادفع|رسوم|فودافون كاش|انستاباي|محفظة|transfer|payment|\bfee\b|wallet|bitcoin|usdt|crypto|invoice/gi },
+      { id:'secrecy', w:10, c:'violet', ar:'طلب سرية', en:'Secrecy',
+        re:/لا تخبر|لا تشارك|سري|don'?t tell|confidential|do not share/gi },
+      { id:'click', w:8, c:'cyan', ar:'دفع للضغط على لينك', en:'Click push',
+        re:/اضغط|انقر|افتح الرابط|اضغط هنا|دوس|على اللينك|اللينك|click here|tap here|open the link|follow the link/gi }
+    ];
+
+    const TXT = {
+      ar: { title:'رادار الهندسة الاجتماعية', sub:'الصق رسالة واتساب / SMS / إيميل — بنحلل أسلوب الخداع النفسي، مش الرابط بس',
+        ph:'الصق الرسالة المشبوهة هنا...', btn:'حلّل الرسالة', empty:'الصق رسالة الأول.',
+        score:'درجة التلاعب', tactics:'أساليب التلاعب المكتشفة', links:'الروابط داخل الرسالة', none:'مفيش أساليب تلاعب واضحة في النص.',
+        nolinks:'مفيش روابط في الرسالة.', risk:['منخفض','متوسط','مرتفع'],
+        want:{ credentials:'يسرق بياناتك الحساسة وبطاقتك', money:'يخليك تحوّل فلوس', click:'يخليك تفتح لينك مشبوه', reward:'يستدرجك بجائزة وهمية' },
+        goal:'هدف المهاجم المحتمل:', tip:['الرسالة تبدو عادية، لكن افحص أي رابط قبل فتحه.',
+          'فيها علامات تلاعب. متضغطش على أي لينك وتأكد من الجهة بالتواصل معاها من رقمها الرسمي.',
+          'احتمال كبير احتيال. متفتحش الرابط، متبعتش أي كود أو بيانات، وامسح الرسالة وبلّغ عن الرقم.'] },
+      en: { title:'Social Engineering Radar', sub:'Paste a WhatsApp / SMS / email message — we analyze the psychological tricks, not just the link',
+        ph:'Paste the suspicious message here...', btn:'Analyze message', empty:'Paste a message first.',
+        score:'Manipulation score', tactics:'Detected manipulation tactics', links:'Links inside the message', none:'No clear manipulation tactics in the text.',
+        nolinks:'No links in the message.', risk:['Low','Medium','High'],
+        want:{ credentials:'steal your sensitive data and card', money:'get you to send money', click:'get you to open a malicious link', reward:'lure you with a fake prize' },
+        goal:'Likely attacker goal:', tip:['Message looks ordinary, but still check any link before opening it.',
+          'Manipulation signs found. Do not click links; verify with the organization through its official number.',
+          'Very likely a scam. Do not open the link or share codes/data; delete the message and report the sender.'] }
+    };
+
+    const COLORS = { amber:'bg-amber-400', red:'bg-red-400', emerald:'bg-emerald-400', sky:'bg-sky-400', violet:'bg-violet-400', cyan:'bg-cyan-400' };
+    const MARK = { amber:'bg-amber-500/30', red:'bg-red-500/30', emerald:'bg-emerald-500/30', sky:'bg-sky-500/30', violet:'bg-violet-500/30', cyan:'bg-cyan-500/30' };
+
+    const card = document.createElement('div');
+    card.id = 'radarCard';
+    card.className = 'glass-card p-6 sm:p-7 rounded-3xl border border-violet-500/20 mb-8';
+    card.innerHTML = `
+      <div class="flex items-center gap-3 mb-4">
+        <div class="p-2 bg-violet-500/10 rounded-xl text-violet-400"><i data-lucide="radar" class="w-5 h-5"></i></div>
+        <div><h3 id="radarTitle" class="text-lg font-bold text-white"></h3><p id="radarSub" class="text-xs text-gray-400"></p></div>
+      </div>
+      <textarea id="radarInput" rows="4" class="w-full bg-gray-950/80 border border-gray-700/80 p-4 rounded-2xl text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:border-violet-500"></textarea>
+      <button id="radarBtn" class="mt-3 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-bold px-6 py-2.5 rounded-xl text-sm"></button>
+      <div id="radarOut" class="hidden mt-5 space-y-4"></div>`;
+    extraToolsContainer.appendChild(card);
+
+    function applyLang() {
+      const t = TXT[L()];
+      const radarTitleEl = document.getElementById('radarTitle');
+      const radarSubEl = document.getElementById('radarSub');
+      const radarInputEl = document.getElementById('radarInput');
+      const radarBtnEl = document.getElementById('radarBtn');
+      if (radarTitleEl) radarTitleEl.innerText = t.title;
+      if (radarSubEl) radarSubEl.innerText = t.sub;
+      if (radarInputEl) radarInputEl.placeholder = t.ph;
+      if (radarBtnEl) radarBtnEl.innerText = t.btn;
+    }
+    applyLang();
+    const sel = document.getElementById('langSelector');
+    if (sel) sel.addEventListener('change', applyLang);
+
+    function extractLinks(text) {
+      const re = /(https?:\/\/[^\s]+|\b[a-z0-9-]+(?:\.[a-z0-9-]+)*\.[a-z]{2,}(?:\/[^\s]*)?)/gi;
+      const out = new Set();
+      (text.match(re) || []).forEach(m => out.add(m.replace(/[.,;:!?)\]،؛]+$/, '')));
+      return [...out];
+    }
+
+    function analyze() {
+      const t = TXT[L()];
+      const out = document.getElementById('radarOut');
+      const text = document.getElementById('radarInput').value.trim();
+      if (!text) { alert(t.empty); return; }
+
+      const found = [], ranges = [];
+      TACTICS.forEach(tc => {
+        const ms = [...text.matchAll(new RegExp(tc.re.source, tc.re.flags))];
+        if (ms.length) {
+          found.push({ tc, n: ms.length });
+          ms.forEach(m => ranges.push([m.index, m.index + m[0].length, tc.c]));
+        }
+      });
+      ranges.sort((a, b) => a[0] - b[0]);
+      let html = '', pos = 0;
+      ranges.forEach(([s, e, c]) => {
+        if (s < pos) return;
+        html += esc(text.slice(pos, s)) + `<mark class="${MARK[c]} text-white rounded px-0.5">${esc(text.slice(s, e))}</mark>`;
+        pos = e;
+      });
+      html += esc(text.slice(pos));
+
+      const links = extractLinks(text).map(raw => {
+        let dna = null, u = null;
+        try { u = new URL(/^https?:/i.test(raw) ? raw : 'https://' + raw);
+          if (typeof runDeceptionDNA === 'function') dna = runDeceptionDNA(u, raw); } catch (e) {}
+        return { raw, dna };
+      });
+
+      let score = found.reduce((a, f) => a + f.tc.w, 0);
+      const hasPressure = found.some(f => ['urgency', 'fear'].includes(f.tc.id));
+      const hasClick = found.some(f => f.tc.id === 'click') || links.length > 0;
+      if (hasPressure && hasClick) score += 10;
+      const maxDna = Math.max(0, ...links.map(l => (l.dna ? l.dna.score : 0)));
+      score = Math.min(100, score + Math.round(maxDna * 0.5));
+      const lvl = score >= 55 ? 2 : score >= 25 ? 1 : 0;
+      const pal = ['text-emerald-300 border-emerald-500/30 bg-emerald-500/10', 'text-amber-300 border-amber-500/30 bg-amber-500/10', 'text-red-300 border-red-500/30 bg-red-500/10'][lvl];
+
+      const goals = ['credentials', 'money', 'click', 'reward'].filter(k => k === 'click' ? hasClick && hasPressure : found.some(f => f.tc.id === k)).map(k => t.want[k]);
+
+      const bars = found.length ? found.map(f => `
+        <div class="flex items-center gap-3 text-xs">
+          <span class="w-36 shrink-0 text-gray-300">${f.tc[L()]} ×${f.n}</span>
+          <div class="flex-grow h-2 bg-gray-800 rounded-full overflow-hidden"><div class="${COLORS[f.tc.c]} h-full rounded-full" style="width:${Math.min(100, f.tc.w * 4)}%"></div></div>
+          <span class="w-8 text-gray-500 text-left">+${f.tc.w}</span>
+        </div>`).join('') : `<div class="text-xs text-gray-400">${t.none}</div>`;
+
+      const linkRows = links.length ? links.map(l => {
+        const s = l.dna ? l.dna.score : null;
+        const c = s === null ? 'text-gray-400' : s >= 50 ? 'text-red-300' : s >= 20 ? 'text-amber-300' : 'text-emerald-300';
+        return `<div class="flex items-center justify-between gap-3 bg-gray-950/70 border border-gray-800 rounded-xl p-2.5 text-xs">
+          <span dir="ltr" class="font-mono break-all text-gray-200">${esc(l.raw)}</span>
+          <span class="${c} font-bold shrink-0">${s === null ? '—' : s + '/100'}</span></div>`;
+      }).join('') : `<div class="text-xs text-gray-400">${t.nolinks}</div>`;
+
+      out.innerHTML = `
+        <div class="p-4 rounded-2xl border ${pal} flex items-center justify-between gap-3">
+          <div><div class="text-xs opacity-80">${t.score}</div>
+            <div class="text-2xl font-black">${score}/100 · ${t.risk[lvl]}</div></div>
+          <div class="text-xs max-w-md">${t.tip[lvl]}${goals.length ? `<br><strong>${t.goal}</strong> ${goals.join(' • ')}` : ''}</div>
+        </div>
+        <div class="bg-gray-950/80 p-4 rounded-2xl border border-gray-800 text-sm leading-relaxed whitespace-pre-line">${html}</div>
+        <div><div class="text-sm font-bold text-white mb-2">${t.tactics}</div><div class="space-y-2">${bars}</div></div>
+        <div><div class="text-sm font-bold text-white mb-2">${t.links}</div><div class="space-y-2">${linkRows}</div></div>`;
+      out.classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    const radarBtnEl = document.getElementById('radarBtn');
+    if (radarBtnEl) radarBtnEl.addEventListener('click', analyze);
+    lucide.createIcons();
+  })();
+  </script>
+  <script>
+(function () {
+  const L = () => ((document.documentElement.lang || 'ar') === 'ar' ? 'ar' : 'en');
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const MAX = 50 * 1024 * 1024; // حد أقصى 50 ميجا
+
+  const TXT = {
+    ar: { 
+      title:'فحص الملفات الخصوصي (Private File Triage)', 
+      sub:'الملف بيتحلل جوه متصفحك ومبيتبعتش لأي سيرفر — عكس مواقع الفحص اللي بترفع الملفات',
+      drop:'اسحب ملف هنا أو اضغط للاختيار (حتى 50 ميجا)', big:'الملف أكبر من 50 ميجا.', err:'تعذر قراءة الملف.',
+      priv:'🔒 اتحلل محليًا — الملف مارحش لأي مكان.', risk:['منخفض','متوسط','مرتفع'],
+      facts:'بيانات الملف', name:'الاسم', size:'الحجم', det:'النوع الحقيقي', decl:'الامتداد المعلن', ent:'الإنتروبي', sha:'SHA-256',
+      find:'مؤشرات الاشتباه', clean:'مفيش مؤشرات اشتباه واضحة في الفحص السريع.', vt:'ابحث عن البصمة في VirusTotal', copy:'نسخ', copied:'تم النسخ ✓',
+      note:'تنبيه: ده فحص أولي سريع ومش بديل للـ Antivirus.'
+    },
+    en: { 
+      title:'Private File Triage', 
+      sub:'The file is analyzed inside your browser and never sent to any server — unlike scanners that upload files',
+      drop:'Drag a file here or click to choose (up to 50 MB)', big:'File is larger than 50 MB.', err:'Could not read the file.',
+      priv:'🔒 Analyzed locally — the file went nowhere.', risk:['Low','Medium','High'],
+      facts:'File facts', name:'Name', size:'Size', det:'Real type', decl:'Declared extension', ent:'Entropy', sha:'SHA-256',
+      find:'Suspicion indicators', clean:'No clear suspicion indicators in this quick triage.', vt:'Look up this fingerprint on VirusTotal', copy:'Copy', copied:'Copied ✓',
+      note:'Note: this is a quick triage, not an antivirus replacement.'
+    }
+  };
+
+  // إنشاء الكارد بنفس حجم وعرض كارد الـ QR code بالضبط
+  let card = document.getElementById('fileTriageCard');
+  if (!card) {
+    card = document.createElement('div');
+    card.id = 'fileTriageCard';
+    card.className = 'glass-card p-7 sm:p-8 rounded-3xl border border-lime-500/20 mb-8 hidden mt-6 max-w-6xl mx-auto w-full';
+    card.innerHTML = `
+      <div class="flex items-center justify-between gap-3 mb-5">
+        <div class="flex items-center gap-3">
+          <div class="p-3 bg-lime-500/10 rounded-2xl text-lime-400"><i data-lucide="file-search" class="w-6 h-6"></i></div>
+          <div><h3 id="ftTitle" class="text-lg font-bold text-white"></h3><p id="ftSub" class="text-xs text-gray-400"></p></div>
+        </div>
+      </div>
+      <label id="ftDrop" class="block cursor-pointer text-center text-sm text-gray-400 border border-dashed border-gray-700 hover:border-lime-500/60 rounded-2xl p-7 transition">
+        <span id="ftDropText"></span><input id="ftFile" type="file" class="hidden">
+      </label>
+      <div id="ftOut" class="hidden mt-5 space-y-4"></div>`;
+    
+    const siteFooter = document.querySelector('footer');
+    const mainContainer = document.querySelector('main') || document.body;
+    if (siteFooter && siteFooter.parentNode) {
+      siteFooter.parentNode.insertBefore(card, siteFooter);
+    } else {
+      mainContainer.appendChild(card);
+    }
+  }
+
+  function applyLang() { 
+    const t = TXT[L()]; 
+    if (document.getElementById('ftTitle')) {
+      document.getElementById('ftTitle').innerText = t.title; 
+      document.getElementById('ftSub').innerText = t.sub; 
+      document.getElementById('ftDropText').innerText = t.drop; 
+    }
+  }
+  applyLang();
+  const sel = document.getElementById('langSelector'); if (sel) sel.addEventListener('change', applyLang);
+
+  function detect(b) {
+    if (b.length > 2 && b[0] === 0x4D && b[1] === 0x5A) return 'exe';
+    if (b.length > 4 && b[0] === 0x25 && b[1] === 0x50 && b[2] === 0x44 && b[3] === 0x46) return 'pdf';
+    let bin = 0; const n = Math.min(b.length, 1024);
+    for (let i = 0; i < n; i++) if (b[i] === 0 || (b[i] < 9) || (b[i] > 13 && b[i] < 32)) bin++;
+    return n && bin / n < 0.02 ? 'text' : 'unknown';
+  }
+
+  function entropy(b) {
+    const n = Math.min(b.length, 1 << 20); if (!n) return 0;
+    const f = new Uint32Array(256); for (let i = 0; i < n; i++) f[b[i]]++;
+    let e = 0; for (let i = 0; i < 256; i++) if (f[i]) { const p = f[i] / n; e -= p * Math.log2(p); } return e;
+  }
+
+  function analyze(b, fileName, size) {
+    const findings = []; let score = 0;
+    const ent = entropy(b);
+    const ext = (fileName.split('.').pop() || '').toLowerCase();
+    if (['exe', 'scr', 'bat', 'cmd'].includes(ext)) { score += 30; findings.push({ w: 30, text: 'ملف قابل للتنفيذ أو تشغيل أوامر مباشرة.' }); }
+    if (ent > 7.2) { score += 15; findings.push({ w: 15, text: 'إنتروبي عالي جداً (محتوى مضغوط أو مشفّر).' }); }
+    return { score: Math.min(100, score), findings, ent, size };
+  }
+
+  async function sha256(buf) {
+    try { const d = await crypto.subtle.digest('SHA-256', buf); return [...new Uint8Array(d)].map(x => x.toString(16).padStart(2, '0')).join(''); }
+    catch (e) { return null; }
+  }
+  const fmtSize = n => n < 1024 ? n + ' B' : n < 1048576 ? (n / 1024).toFixed(1) + ' KB' : (n / 1048576).toFixed(1) + ' MB';
+
+  async function handle(file) {
+    if (!file) return;
+    const t = TXT[L()], out = document.getElementById('ftOut');
+    if (!out) return;
+    out.classList.remove('hidden');
+    if (file.size > MAX) { out.innerHTML = `<div class="text-sm text-red-300">${t.big}</div>`; return; }
+    try {
+      const buf = await file.arrayBuffer(), b = new Uint8Array(buf);
+      const r = analyze(b, file.name, file.size), hash = await sha256(buf);
+      const lvl = r.score >= 50 ? 2 : r.score >= 20 ? 1 : 0;
+      const pal = ['text-emerald-300 border-emerald-500/30 bg-emerald-500/10', 'text-amber-300 border-amber-500/30 bg-amber-500/10', 'text-red-300 border-red-500/30 bg-red-500/10'][lvl];
+      const row = (k, v) => `<tr class="border-t border-gray-800"><td class="py-1.5 pe-3 text-gray-500 whitespace-nowrap">${k}</td><td dir="ltr" class="font-mono text-gray-200 break-all">${v}</td></tr>`;
+      const list = r.findings.length ? r.findings.map(f => `<li class="flex gap-2.5 p-3 rounded-xl border text-xs text-amber-200 bg-amber-950/30 border-amber-500/20"><span>${esc(f.text)}</span></li>`).join('') : `<li class="text-xs text-gray-300">${t.clean}</li>`;
+      
+      out.innerHTML = `
+        <div class="p-4 rounded-2xl border ${pal} flex items-center justify-between gap-3"><span class="font-bold text-base">${t.risk[lvl]} · ${r.score}/100</span><span class="text-xs">${t.priv}</span></div>
+        <div><div class="text-xs font-bold text-white mb-2">${t.facts}</div><table class="w-full text-xs"><tbody>
+          ${row(t.name, esc(file.name))}${row(t.size, fmtSize(file.size))}${row(t.ent, r.ent.toFixed(2) + ' / 8')}${row(t.sha, esc(hash || '—'))}</tbody></table>
+          ${hash ? `<div class="flex flex-wrap gap-2 mt-2"><a href="https://www.virustotal.com/gui/file/${hash}" target="_blank" rel="noopener noreferrer" class="bg-gray-800 hover:bg-gray-700 text-white text-xs font-bold px-4 py-2 rounded-xl">${t.vt}</a></div>` : ''}</div>
+        <div><div class="text-xs font-bold text-white mb-2">${t.find}</div><ul class="space-y-2">${list}</ul></div>
+        <div class="text-[11px] text-gray-500">${t.note}</div>`;
+      
+      const cardEl = document.getElementById('fileTriageCard');
+      if (cardEl) {
+        cardEl.classList.remove('hidden');
+        cardEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      if (window.lucide) lucide.createIcons();
+    } catch (e) { out.innerHTML = `<div class="text-sm text-red-300">${t.err}</div>`; }
+  }
+
+  const dropZone = document.getElementById('ftDrop');
+  const fileElem = document.getElementById('ftFile');
+  if (fileElem && !fileElem.dataset.bound) {
+    fileElem.dataset.bound = 'true';
+    fileElem.addEventListener('change', e => handle(e.target.files[0]));
+  }
+  if (dropZone && !dropZone.dataset.bound) {
+    dropZone.dataset.bound = 'true';
+    ['dragover', 'dragenter'].forEach(ev => dropZone.addEventListener(ev, e => { e.preventDefault(); dropZone.classList.add('border-lime-500'); }));
+    ['dragleave', 'drop'].forEach(ev => dropZone.addEventListener(ev, e => { e.preventDefault(); dropZone.classList.remove('border-lime-500'); }));
+    dropZone.addEventListener('drop', e => { if(e.dataTransfer.files.length) handle(e.dataTransfer.files[0]); });
+  }
+
+  const origRender = window.renderScanOutput;
+  window.renderScanOutput = function (urlObj, heuristics, aiText) {
+    if (typeof origRender === 'function') origRender(urlObj, heuristics, aiText);
+    const cardEl = document.getElementById('fileTriageCard');
+    if (cardEl) cardEl.classList.remove('hidden');
+  };
+
+  window.__ftriage = { handle, card };
+  if (window.lucide) lucide.createIcons();
+})();
+</script>
+  
+
+  <!-- 9. درع الـ QR (QR Shield) -->
+  <script>
+  (function () {
+    const L = () => ((document.documentElement.lang || 'ar') === 'ar' ? 'ar' : 'en');
+    const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+    const TXT = {
+      ar: { title:'درع الـ QR (QR Shield)', sub:'ارفع أو الصق صورة QR — بنفك الكود ونحلل اللي جواه قبل ما تفتحه',
+        drop:'اسحب صورة QR هنا، أو اضغط للاختيار، أو الصق بـ Ctrl+V',
+        fail:'مقدرناش نقرأ QR من الصورة. جرّب صورة أوضح وأقرب.', loadFail:'تعذر تحميل مكتبة فك QR. تأكد من الإنترنت.',
+        content:'محتوى الكود:', type:'نوع المحتوى:', verdict:['آمن نسبيًا','يحتاج حذر','خطير'],
+        scan:'افحصه بالفحص الشامل', types:{ url:'رابط ويب', domain:'دومين بدون بروتوكول', wifi:'بيانات واي فاي', tel:'اتصال هاتفي', sms:'رسالة SMS',
+          mail:'إيميل', pay:'دفع / محفظة', app:'تثبيت تطبيق', geo:'موقع جغرافي', vcard:'جهة اتصال', text:'نص' },
+        n:{ app:'الكود بيحاول يفتح تثبيت تطبيق مباشرة — ده أسلوب شائع لنشر برمجيات خبيثة.',
+            pay:'الكود فيه عملية دفع/تحويل. اتأكد إنك أنت اللي بتبدأ الدفع ومن هوية المستلم.',
+            wifi:'الكود هيوصّلك بشبكة واي فاي. اتصل بالشبكات المعروفة بس.',
+            tel:'الكود هيجهّز مكالمة لرقم معين — اتأكد من الرقم قبل الاتصال.',
+            sms:'الكود هيجهّز رسالة جاهزة تُرسل من رقمك — اقرأها قبل الإرسال.',
+            file:'الرابط بيحمّل ملف قابل للتنفيذ/تثبيت.', short:'الرابط مختصر ومخبّي الوجهة الحقيقية — ده شائع في الـ QR المزيف.',
+            http:'الرابط غير مشفّر (HTTP).', sticker:'نصيحة: لو الـ QR ملصوق فوق QR تاني في مكان عام فاحتمال تزوير — اتأكد إنه مش ستيكر متلصق.' } },
+      en: { title:'QR Shield', sub:'Upload or paste a QR image — we decode it and analyze the payload before you open it',
+        drop:'Drag a QR image here, click to choose, or paste with Ctrl+V',
+        fail:'Could not read a QR code from this image. Try a clearer, closer picture.', loadFail:'Could not load the QR decoder library. Check your connection.',
+        content:'Decoded content:', type:'Content type:', verdict:['Relatively safe','Use caution','Dangerous'],
+        scan:'Run full scan on it', types:{ url:'Web link', domain:'Domain without scheme', wifi:'Wi-Fi credentials', tel:'Phone call', sms:'SMS message',
+          mail:'Email', pay:'Payment / wallet', app:'App install', geo:'Location', vcard:'Contact card', text:'Text' },
+        n:{ app:'The code tries to launch an app install directly — a common way to spread malware.',
+            pay:'The code contains a payment/transfer. Make sure YOU are initiating it and check the recipient.',
+            wifi:'The code will connect you to a Wi-Fi network. Join only networks you know.',
+            tel:'The code will prepare a call to a number — verify it first.',
+            sms:'The code prepares a message sent from your number — read it before sending.',
+            file:'The link downloads an executable/installable file.', short:'The link is shortened and hides the real destination — common in fake QR codes.',
+            http:'The link is not encrypted (HTTP).', sticker:'Tip: if this QR is stuck over another QR in a public place, it may be tampered with — check it is not a sticker.' } }
+    };
+
+    const card = document.createElement('div');
+    card.className = 'glass-card p-6 sm:p-7 rounded-3xl border border-emerald-500/20 mb-8';
+    card.innerHTML = `
+      <div class="flex items-center gap-3 mb-4">
+        <div class="p-2 bg-emerald-500/10 rounded-xl text-emerald-400"><i data-lucide="qr-code" class="w-5 h-5"></i></div>
+        <div><h3 id="qrTitle" class="text-lg font-bold text-white"></h3><p id="qrSub" class="text-xs text-gray-400"></p></div>
+      </div>
+      <label id="qrDrop" class="block cursor-pointer text-center text-sm text-gray-400 border-2 border-dashed border-gray-700 hover:border-emerald-500/60 rounded-2xl p-6 transition">
+        <span id="qrDropText"></span>
+        <input id="qrFile" type="file" accept="image/*" class="hidden">
+      </label>
+      <div id="qrOut" class="hidden mt-5 space-y-3"></div>`;
+    extraToolsContainer.appendChild(card);
+
+    function applyLang() {
+      const t = TXT[L()];
+      const qrTitleEl = document.getElementById('qrTitle');
+      const qrSubEl = document.getElementById('qrSub');
+      const qrDropTextEl = document.getElementById('qrDropText');
+      if (qrTitleEl) qrTitleEl.innerText = t.title;
+      if (qrSubEl) qrSubEl.innerText = t.sub;
+      if (qrDropTextEl) qrDropTextEl.innerText = t.drop;
+    }
+    applyLang();
+    const sel = document.getElementById('langSelector');
+    if (sel) sel.addEventListener('change', applyLang);
+
+    let jsQRLoad = null;
+    function loadJsQR() {
+      if (window.jsQR) return Promise.resolve();
+      if (!jsQRLoad) jsQRLoad = new Promise((res, rej) => {
+        const s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js';
+        s.onload = res; s.onerror = () => rej(new Error('load'));
+        document.head.appendChild(s);
+      });
+      return jsQRLoad;
+    }
+    async function decode(img) {
+      if ('BarcodeDetector' in window) {
+        try {
+          const r = await new BarcodeDetector({ formats: ['qr_code'] }).detect(img);
+          if (r.length) return r[0].rawValue;
+        } catch (e) {}
+      }
+      await loadJsQR();
+      const c = document.createElement('canvas');
+      const max = 1000, k = Math.min(1, max / Math.max(img.width, img.height));
+      c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+      const x = c.getContext('2d', { willReadFrequently: true });
+      x.drawImage(img, 0, 0, c.width, c.height);
+      const d = x.getImageData(0, 0, c.width, c.height);
+      const r = window.jsQR(d.data, d.width, d.height, { inversionAttempts: 'attemptBoth' });
+      return r ? r.data : null;
+    }
+
+    function classify(v) {
+      const s = v.trim(), l = s.toLowerCase();
+      if (/^https?:\/\//.test(l)) return 'url';
+      if (l.startsWith('wifi:')) return 'wifi';
+      if (l.startsWith('tel:')) return 'tel';
+      if (/^(sms|smsto|mms):/.test(l)) return 'sms';
+      if (/^(mailto:|matmsg:)/.test(l)) return 'mail';
+      if (/^(upi:|bitcoin:|ethereum:|litecoin:|paypal\.me)/.test(l)) return 'pay';
+      if (/^(market:|intent:|itms-services:)/.test(l)) return 'app';
+      if (l.startsWith('geo:')) return 'geo';
+      if (l.startsWith('begin:vcard')) return 'vcard';
+      if (/^[a-z0-9-]+(\.[a-z0-9-]+)+\.[a-z]{2,}(\/\S*)?$/.test(l)) return 'domain';
+      return 'text';
+    }
+
+    function show(value, thumb) {
+      const t = TXT[L()], out = document.getElementById('qrOut');
+      const type = classify(value);
+      const notes = []; let score = 0, urlObj = null, dna = null;
+
+      if (type === 'app') { score += 55; notes.push(t.n.app); }
+      if (type === 'pay') { score += 25; notes.push(t.n.pay); }
+      if (type === 'wifi') { score += 15; notes.push(t.n.wifi); }
+      if (type === 'tel') { score += 20; notes.push(t.n.tel); }
+      if (type === 'sms') { score += 25; notes.push(t.n.sms); }
+
+      if (type === 'url' || type === 'domain') {
+        try {
+          urlObj = new URL(type === 'url' ? value.trim() : 'https://' + value.trim());
+          if (typeof runDeceptionDNA === 'function') { dna = runDeceptionDNA(urlObj, value); score += dna.score; }
+          if (/\.(apk|exe|msi|dmg|bat|scr|jar|ipa)(\?|$)/i.test(urlObj.pathname)) { score += 50; notes.push(t.n.file); }
+          if (/(^|\.)(bit\.ly|tinyurl\.com|t\.co|ow\.ly|is\.gd|rebrand\.ly|cutt\.ly|buff\.ly)$/.test(urlObj.hostname)) { score += 25; notes.push(t.n.short); }
+          if (urlObj.protocol === 'http:') { score += 10; notes.push(t.n.http); }
+        } catch (e) {}
+      }
+      score = Math.min(100, score);
+      const lvl = score >= 50 ? 2 : score >= 20 ? 1 : 0;
+      const pal = ['text-emerald-300 border-emerald-500/30 bg-emerald-500/10', 'text-amber-300 border-amber-500/30 bg-amber-500/10', 'text-red-300 border-red-500/30 bg-red-500/10'][lvl];
+
+      const dnaRows = dna ? dna.sigs.slice().sort((a, b) => b.w - a.w).map(s => `<li class="text-xs text-amber-200">• ${esc(s.text)}</li>`).join('') : '';
+      const noteRows = notes.map(n => `<li class="text-xs text-amber-200">• ${esc(n)}</li>`).join('');
+
+      out.innerHTML = `
+        <div class="flex gap-4 items-start">
+          <img src="${thumb}" class="w-24 h-24 object-contain rounded-xl bg-white p-1 shrink-0" alt="QR">
+          <div class="flex-grow min-w-0">
+            <div class="text-xs text-gray-400">${t.type} <span class="text-gray-200 font-bold">${t.types[type]}</span></div>
+            <div class="text-xs text-gray-400 mt-1">${t.content}</div>
+            <div dir="ltr" class="font-mono text-sm break-all bg-gray-950/80 border border-gray-800 rounded-xl p-2.5 mt-1">${esc(value)}</div>
+          </div>
+        </div>
+        <div class="p-3 rounded-2xl border ${pal} font-bold text-sm">${t.verdict[lvl]} · ${score}/100</div>
+        <ul class="space-y-1">${noteRows}${dnaRows}<li class="text-xs text-gray-400">${t.n.sticker}</li></ul>
+        ${urlObj ? `<button id="qrScanBtn" class="bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-bold px-5 py-2 rounded-xl text-sm">${t.scan}</button>` : ''}`;
+      out.classList.remove('hidden');
+      const b = document.getElementById('qrScanBtn');
+      if (b) b.onclick = () => {
+        const inp = document.getElementById('urlInput');
+        if (inp) {
+          inp.value = urlObj.href;
+          inp.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          runComprehensiveScan();
+        }
+      };
+      lucide.createIcons();
+    }
+
+    function handleFile(file) {
+      if (!file || !file.type.startsWith('image/')) return;
+      const t = TXT[L()], out = document.getElementById('qrOut');
+      const url = URL.createObjectURL(file), img = new Image();
+      img.onload = async () => {
+        try {
+          const v = await decode(img);
+          if (v) show(v, url);
+          else { out.innerHTML = `<div class="text-sm text-red-300">${t.fail}</div>`; out.classList.remove('hidden'); }
+        } catch (e) { out.innerHTML = `<div class="text-sm text-red-300">${t.loadFail}</div>`; out.classList.remove('hidden'); }
+      };
+      img.src = url;
+    }
+
+    const drop = document.getElementById('qrDrop'), fileIn = document.getElementById('qrFile');
+    if (fileIn) fileIn.addEventListener('change', e => handleFile(e.target.files[0]));
+    if (drop) {
+      ['dragover', 'dragenter'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('border-emerald-500'); }));
+      ['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('border-emerald-500'); }));
+      drop.addEventListener('drop', e => handleFile(e.dataTransfer.files[0]));
+    }
+    document.addEventListener('paste', e => {
+      const item = [...(e.clipboardData ? e.clipboardData.items : [])].find(i => i.type.startsWith('image/'));
+      if (item) handleFile(item.getAsFile());
+    });
+    lucide.createIcons();
+  })();
+  </script>
+  <script>
+(function () {
+  const L = () => ((document.documentElement.lang || 'ar') === 'ar' ? 'ar' : 'en');
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const KEY = 'checklink_rescue_v1';
+  const store = {
+    get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+    set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  };
+
+  const EVENTS = [
+    { id:'click',    ic:'mouse-pointer-click', ar:'فتحت الرابط بس ومدخلتش حاجة', en:'I only opened the link and entered nothing' },
+    { id:'pass',     ic:'key-round',            ar:'دخّلت كلمة مرور / بيانات دخول', en:'I entered a password / login details' },
+    { id:'card',     ic:'credit-card',          ar:'دخّلت بيانات بطاقة بنكية', en:'I entered bank card details' },
+    { id:'otp',      ic:'message-square-lock', ar:'بعتّ كود تحقق (OTP) لحد', en:'I sent a verification code (OTP) to someone' },
+    { id:'install',  ic:'download',             ar:'نزّلت أو ثبّتّ ملف / تطبيق', en:'I downloaded or installed a file / app' },
+    { id:'money',    ic:'banknote',             ar:'حوّلت فلوس', en:'I transferred money' },
+    { id:'docs',     ic:'id-card',              ar:'بعتّ صورة بطاقة / باسبور / مستندات', en:'I sent an ID / passport / documents' },
+    { id:'taken',    ic:'user-x',               ar:'حسابي اتسرق أو بيتصرف لوحده', en:'My account was taken over or acts on its own' }
+  ];
+  const NOT_CLICK = ['pass','card','otp','install','money','docs','taken'];
+
+  const ACTIONS = [
+    { id:'a1', urg:0, when:['card'],
+      ar:'كلّم البنك دلوقتي من الرقم المكتوب ورا الكارت (مش من رقم في الرسالة) واطلب إيقاف الكارت وإصدار بدل.',
+      en:'Call your bank now using the number on the back of the card (not one from the message) and ask to freeze the card and issue a new one.' },
+    { id:'a2', urg:0, when:['otp'],
+      ar:'الكود اللي بعتّه ممكن يكون اتستخدم لتحويل أو لدخول حسابك. بلّغ البنك أو مزوّد المحفظة فورًا وراجع آخر العمليات.',
+      en:'The code you sent may already be used for a transfer or a login. Tell your bank or wallet provider immediately and review recent transactions.' },
+    { id:'a3', urg:0, when:['money'],
+      ar:'كلّم البنك أو مزوّد المحفظة فورًا واطلب تتبّع التحويل أو إيقافه — الدقايق الأولى هي الأهم. احتفظ بإيصال التحويل.',
+      en:'Call your bank or wallet provider right away and ask to trace or stop the transfer — the first minutes matter most. Keep the transfer receipt.' },
+    { id:'a4', urg:0, when:['pass','taken'],
+      ar:'من جهاز تاني نضيف: غيّر كلمة مرور الحساب المتأثر، وبعدين اختار «تسجيل الخروج من كل الأجهزة».',
+      en:'From another clean device: change the affected account’s password, then choose “sign out of all devices”.' },
+    { id:'a5', urg:1, when:['pass','otp','taken'],
+      ar:'فعّل التحقق بخطوتين، ويفضّل تطبيق Authenticator بدل الرسائل النصية.',
+      en:'Turn on 2-step verification, preferably with an authenticator app instead of SMS.' },
+    { id:'a6', urg:1, when:['pass'],
+      ar:'لو كلمة المرور دي مستخدمة في حسابات تانية، غيّرها هناك كمان (ابدأ بالإيميل والبنك). والأفضل مدير كلمات مرور.',
+      en:'If that password is used on other accounts, change it there too (start with email and banking). A password manager helps.' },
+    { id:'a7', urg:1, when:['install'],
+      ar:'فعّل وضع الطيران، وامسح التطبيق أو الملف، وشيل صلاحيات «مسؤول الجهاز» و«إمكانية الوصول» لأي تطبيق مش عارفه، وبعدين شغّل فحص مضاد فيروسات. لو الجهاز فيه تطبيقات بنك، غيّر كلماتها من جهاز تاني.',
+      en:'Enable airplane mode, remove the app or file, revoke “device admin” and “accessibility” permissions from anything unfamiliar, then run an antivirus scan. If banking apps are on the device, change their passwords from another device.' },
+    { id:'a8', urg:1, when:['taken'],
+      ar:'استرجع الحساب من صفحة الاسترجاع الرسمية، وراجع رقم الاسترجاع وإيميله، وأي قاعدة تحويل (Forwarding) في الإيميل. نبّه أصحابك إن أي رسالة جاية منك مشبوهة.',
+      en:'Recover the account through the official recovery page, check its recovery phone/email and any email forwarding rules. Warn your contacts that messages from you may be fake.' },
+    { id:'a9', urg:2, when:['click'],
+      ar:'اقفل الصفحة ومتدخلش أي بيانات. اتأكد إن مفيش ملف اتنزّل لوحده في التنزيلات، ولو لقيت ملف مجهول متفتحوش.',
+      en:'Close the page and enter no data. Check Downloads for any file that downloaded by itself, and do not open an unknown one.' },
+    { id:'a10', urg:2, when:['pass','card','otp','install','money','docs','taken'],
+      ar:'احتفظ بالأدلة: لقطة شاشة للصفحة والرسالة الأصلية. وكارت «عدة البلاغ» تحت بيجهّز لك نص البلاغ والتقرير.',
+      en:'Keep evidence: screenshots of the page and the original message. The “Incident Kit” card below prepares your report text and file.' },
+    { id:'a11', urg:2, when:['docs'],
+      ar:'اتصل بمزوّد الشبكة واسأل عن الخطوط المسجّلة باسمك، وبلّغ البنك إن بياناتك اتسربت عشان يراقب أي طلب باسمك.',
+      en:'Ask your mobile provider which lines are registered in your name, and tell your bank your data leaked so they watch for requests in your name.' },
+    { id:'a12', urg:3, when:['card','money','pass','taken'],
+      ar:'راقب كشف الحساب شهر على الأقل، وفعّل إشعارات كل عملية على الموبايل.',
+      en:'Watch your statements for at least a month and turn on per-transaction notifications.' },
+    { id:'a13', urg:3, when:NOT_CLICK,
+      ar:'بلّغ جهة الجرائم الإلكترونية في بلدك (في مصر: إدارة مكافحة جرائم الحاسبات وشبكات المعلومات، أو EG-CERT)، وبلّغ المنصة اللي الرسالة وصلتك عليها.',
+      en:'Report to your country’s cybercrime authority (in Egypt: the Computer and Information Network Crimes unit, or EG-CERT) and to the platform the message reached you on.' }
+  ];
+
+  const TXT = {
+    ar: { title:'مساعد الإنقاذ (Rescue Wizard)', sub:'دليلك الفوري لاتخاذ إجراءات طارئة لو وقعت في رابط مشبوه',
+      q:'إيه اللي حصل؟ (اختار كل اللي ينطبق)', btn:'جهّز خطة الإنقاذ', empty:'اختار حاجة واحدة على الأقل.',
+      urg:['الآن','خلال ساعة','النهارده','الأسبوع ده'], prog:(d,n)=>`${d} من ${n} خطوات اتعملت`, reset:'ابدأ من جديد',
+      done:'كل الخطوات خلصت 👏 راجع كشف حسابك لفترة.',
+      note:'الخطة إرشادات عامة مش بديل للجهات الرسمية. استخدم الأرقام الرسمية فقط، ومتتواصلش مع اللي نصب عليك.',
+      pwT:'هل كلمة المرور دي اتسربت قبل كده؟', pwSub:'اكتب كلمة المرور اللي دخّلتها في الصفحة المشبوهة. بنحسب بصمتها جوه متصفحك وبنبعت أول 5 حروف منها بس لخدمة Pwned Passwords — مش الكلمة ولا البصمة كاملة.',
+      pwPh:'كلمة المرور', pwBtn:'افحصها', pwEmpty:'اكتب كلمة المرور الأول.',
+      pwHit:(n)=>`⚠️ ظهرت في ${n.toLocaleString('ar-EG')} تسريب معروف. متستخدمهاش تاني في أي مكان.`,
+      pwOk:'✅ مش موجودة في قاعدة التسريبات المعروفة. ده مش معناه إنها قوية — لو دخّلتها في صفحة تصيّد فغيّرها برضه.',
+      pwErr:'تعذر الاتصال بالخدمة. تأكد من الإنترنت وجرّب تاني.', pwWait:'جاري الفحص...',
+      pwNet:'بالمناسبة: ده الطلب الشبكي الوحيد في الموقع، وعدّاد الخصوصية هيظهره بصراحة.',
+      hint:'🚨 الرابط اللي فحصته فيه خطر. لو فتحته أو دخّلت بيانات، ابدأ من هنا.' },
+    en: { title:'Rescue Wizard', sub:'Your instant guide for emergency actions if you fell for a suspicious link',
+      q:'What happened? (select all that apply)', btn:'Build my rescue plan', empty:'Select at least one item.',
+      urg:['Right now','Within 1 hour','Today','This week'], prog:(d,n)=>`${d} of ${n} steps done`, reset:'Start over',
+      done:'All steps done 👏 Keep watching your statements for a while.',
+      note:'The plan is general guidance, not a replacement for official bodies. Use official numbers only, and never contact the scammer.',
+      pwT:'Has this password leaked before?', pwSub:'Type the password you entered on the suspicious page. Its hash is computed in your browser and only the first 5 characters are sent to the Pwned Passwords service — never the password or the full hash.',
+      pwPh:'Password', pwBtn:'Check it', pwEmpty:'Type a password first.',
+      pwHit:(n)=>`⚠️ It appeared in ${n.toLocaleString('en-US')} known breaches. Never use it anywhere again.`,
+      pwOk:'✅ Not found in known breach data. That does not make it strong — if you typed it on a phishing page, change it anyway.',
+      pwErr:'Could not reach the service. Check your connection and try again.', pwWait:'Checking...',
+      pwNet:'By the way: this is the only network request on the site, and the Privacy Meter will show it honestly.',
+      hint:'🚨 The link you scanned is dangerous. If you opened it or entered data, start here.' }
+  };
+
+  // إنشاء الكارد ووضعه تلقائياً بعد قسم النتائج (resultsSection) لكي يظهر في المكان المطلوب أسفل التقارير
+  const anchor = document.getElementById('resultsSection') || document.getElementById('loadingState');
+  if (!anchor) return;
+  const card = document.createElement('div');
+  card.id = 'rescueCard';
+  card.className = 'glass-card p-6 sm:p-7 rounded-3xl border border-red-500/20 mb-8 hidden mt-6';
+  card.innerHTML = `
+    <div class="flex items-center gap-3 mb-4">
+      <div class="p-2 bg-red-500/10 rounded-xl text-red-400"><i data-lucide="life-buoy" class="w-5 h-5"></i></div>
+      <div><h3 id="rwTitle" class="text-lg font-bold text-white"></h3><p id="rwSub" class="text-xs text-gray-400"></p></div>
+    </div>
+    <div id="rwHint" class="hidden mb-4 p-3 rounded-xl border border-red-500/30 bg-red-950/30 text-xs text-red-200"></div>
+    <div id="rwQ" class="text-sm font-bold text-white mb-2"></div>
+    <div id="rwEvents" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
+    <div class="flex flex-wrap items-center gap-3 mt-3">
+      <button id="rwBtn" class="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-500 hover:to-orange-500 text-white font-bold px-6 py-2.5 rounded-xl text-sm"></button>
+      <button id="rwReset" class="hidden bg-gray-800 hover:bg-gray-700 text-white font-bold px-5 py-2.5 rounded-xl text-sm"></button>
+    </div>
+    <div id="rwOut" class="hidden mt-5 space-y-4"></div>
+    <div class="mt-6 pt-5 border-t border-gray-800">
+      <div id="rwPwT" class="text-sm font-bold text-white"></div>
+      <p id="rwPwSub" class="text-[11px] text-gray-400 mt-1 mb-2"></p>
+      <div class="flex gap-2">
+        <input id="rwPw" type="password" dir="ltr" autocomplete="off" class="flex-grow bg-gray-950/80 border border-gray-700/80 px-4 py-2.5 rounded-xl text-sm font-mono text-gray-100 focus:outline-none focus:border-red-500">
+        <button id="rwPwBtn" class="shrink-0 bg-gray-800 hover:bg-gray-700 text-white font-bold px-5 rounded-xl text-sm"></button>
+      </div>
+      <div id="rwPwOut" class="mt-3 text-sm"></div>
+      <div id="rwPwNet" class="mt-1 text-[11px] text-gray-500"></div>
+    </div>
+    <div id="rwNote" class="mt-4 text-[11px] text-gray-500"></div>`;
+  
+  anchor.parentNode.insertBefore(card, anchor.nextSibling);
+
+  const g = id => document.getElementById(id);
+  let selected = new Set();
+  let planIds = [];
+
+  function loadChecked() { try { return new Set(JSON.parse(store.get(KEY) || '[]')); } catch (e) { return new Set(); } }
+  function saveChecked(set) { store.set(KEY, JSON.stringify([...set])); }
+
+  function renderEvents() {
+    const l = L();
+    const evContainer = g('rwEvents');
+    if (!evContainer) return;
+    evContainer.innerHTML = EVENTS.map(e => `
+      <label class="flex items-center gap-3 bg-gray-950/70 hover:bg-gray-900 border border-gray-800 rounded-xl p-3 cursor-pointer text-sm text-gray-200">
+        <input type="checkbox" data-ev="${e.id}" ${selected.has(e.id) ? 'checked' : ''}>
+        <i data-lucide="${e.ic}" class="w-4 h-4 text-red-300 shrink-0"></i><span>${esc(e[l])}</span>
+      </label>`).join('');
+    evContainer.querySelectorAll('input[data-ev]').forEach(cb => cb.addEventListener('change', () => {
+      cb.checked ? selected.add(cb.dataset.ev) : selected.delete(cb.dataset.ev);
+    }));
+    if (window.lucide) lucide.createIcons();
+  }
+
+  function applyLang() {
+    if (!g('rwTitle')) return;
+    const t = TXT[L()];
+    g('rwTitle').innerText = t.title; g('rwSub').innerText = t.sub; g('rwQ').innerText = t.q;
+    g('rwBtn').innerText = t.btn; g('rwReset').innerText = t.reset;
+    g('rwPwT').innerText = t.pwT; g('rwPwSub').innerText = t.pwSub; g('rwPw').placeholder = t.pwPh;
+    g('rwPwBtn').innerText = t.pwBtn; g('rwPwNet').innerText = t.pwNet; g('rwNote').innerText = t.note;
+    if (!g('rwHint').classList.contains('hidden')) g('rwHint').innerText = t.hint;
+    renderEvents();
+    if (!g('rwOut').classList.contains('hidden')) renderPlan();
+  }
+
+  function buildPlan() {
+    const t = TXT[L()];
+    if (!selected.size) { alert(t.empty); return; }
+    const sel = [...selected];
+    const acts = ACTIONS.filter(a => a.when.some(w => sel.includes(w)))
+      .filter(a => !(a.id === 'a9' && sel.some(s => NOT_CLICK.includes(s))));
+    planIds = acts.map(a => a.id);
+    renderPlan();
+    g('rwReset').classList.remove('hidden');
+  }
+
+  function renderPlan() {
+    const t = TXT[L()], l = L(), out = g('rwOut'), checked = loadChecked();
+    if (!out) return;
+    const acts = ACTIONS.filter(a => planIds.includes(a.id));
+    const done = acts.filter(a => checked.has(a.id)).length;
+    const pct = acts.length ? Math.round(done / acts.length * 100) : 0;
+    const colors = ['text-red-300', 'text-orange-300', 'text-amber-300', 'text-sky-300'];
+    let html = `<div><div class="flex items-center justify-between text-xs text-gray-400 mb-1"><span>${t.prog(done, acts.length)}</span><span>${pct}%</span></div>
+      <div class="h-2 bg-gray-800 rounded-full overflow-hidden"><div class="h-full bg-emerald-400" style="width:${pct}%"></div></div></div>`;
+    if (acts.length && done === acts.length) html += `<div class="p-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-200 text-sm">${t.done}</div>`;
+    [0, 1, 2, 3].forEach(u => {
+      const group = acts.filter(a => a.urg === u);
+      if (!group.length) return;
+      html += `<div><div class="text-sm font-bold ${colors[u]} mb-2">${t.urg[u]}</div><ul class="space-y-2">` +
+        group.map(a => `<li><label class="flex items-start gap-3 p-3 rounded-xl border border-gray-800 bg-gray-950/70 cursor-pointer text-sm ${checked.has(a.id) ? 'opacity-50 line-through' : 'text-gray-100'}">
+          <input type="checkbox" data-act="${a.id}" class="mt-1" ${checked.has(a.id) ? 'checked' : ''}><span>${esc(a[l])}</span></label></li>`).join('') + `</ul></div>`;
+    });
+    out.innerHTML = html;
+    out.classList.remove('hidden');
+    out.querySelectorAll('input[data-act]').forEach(cb => cb.addEventListener('change', () => {
+      const s = loadChecked(); cb.checked ? s.add(cb.dataset.act) : s.delete(cb.dataset.act);
+      saveChecked(s); renderPlan();
+    }));
+  }
+
+  async function checkPassword() {
+    const t = TXT[L()], out = g('rwPwOut'), pw = g('rwPw').value;
+    if (!pw) { out.className = 'mt-3 text-sm text-amber-200'; out.innerText = t.pwEmpty; return; }
+    out.className = 'mt-3 text-sm text-gray-300'; out.innerText = t.pwWait;
+    try {
+      const buf = await crypto.subtle.digest('SHA-1', new TextEncoder().encode(pw));
+      const hex = [...new Uint8Array(buf)].map(x => x.toString(16).padStart(2, '0')).join('').toUpperCase();
+      const prefix = hex.slice(0, 5), suffix = hex.slice(5);
+      const res = await fetch('https://api.pwnedpasswords.com/range/' + prefix, { headers: { 'Add-Padding': 'true' } });
+      if (!res.ok) throw new Error('http');
+      const text = await res.text();
+      let count = 0;
+      text.split('\n').forEach(line => {
+        const [s, c] = line.trim().split(':');
+        if (s === suffix) count = parseInt(c, 10) || 0;
+      });
+      if (count > 0) { out.className = 'mt-3 text-sm text-red-200'; out.innerText = t.pwHit(count); }
+      else { out.className = 'mt-3 text-sm text-emerald-200'; out.innerText = t.pwOk; }
+    } catch (e) { out.className = 'mt-3 text-sm text-red-300'; out.innerText = t.pwErr; }
+    g('rwPw').value = '';
+  }
+
+  g('rwBtn').addEventListener('click', buildPlan);
+  g('rwReset').addEventListener('click', () => {
+    saveChecked(new Set()); selected = new Set(); planIds = [];
+    g('rwOut').classList.add('hidden'); g('rwReset').classList.add('hidden'); renderEvents();
+  });
+  g('rwPwBtn').addEventListener('click', checkPassword);
+  g('rwPw').addEventListener('keydown', e => { if (e.key === 'Enter') checkPassword(); });
+  const sel = document.getElementById('langSelector'); if (sel) sel.addEventListener('change', applyLang);
+  applyLang();
+
+  // ربط ظهور الكارد بنهاية دالة عرض نتائج الفحص بحيث يظهر تلقائياً بعد كل تحليل
+  const origRender = window.renderScanOutput;
+  window.renderScanOutput = function (urlObj, heuristics, aiText) {
+    if (typeof origRender === 'function') {
+      origRender(urlObj, heuristics, aiText);
+    }
+    const h = g('rwHint');
+    const rescueCard = g('rescueCard');
+    
+    if (heuristics && heuristics.score >= 25) { 
+      if (h) {
+        h.innerText = TXT[L()].hint; 
+        h.classList.remove('hidden'); 
+      }
+    } else { 
+      if (h) h.classList.add('hidden');
+    }
+
+    // إظهار الكارد فوراً بعد انتهاء تحليل أي رابط
+    if (rescueCard) {
+      rescueCard.classList.remove('hidden');
+    }
+  };
+
+  window.__rescue = { buildPlan, checkPassword, ACTIONS };
+  if (window.lucide) lucide.createIcons();
+})();
+</script>
+<script>
+(function () {
+  const L = () => ((document.documentElement.lang || 'ar') === 'ar' ? 'ar' : 'en');
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const strip = h => String(h).replace(/<[^>]*>/g, '').trim();
+
+  const PROVIDERS = [
+    { id:'ngrok', name:'ngrok', kind:'tunnel', suffix:['ngrok.io','ngrok.app','ngrok.dev','ngrok-free.app','ngrok-free.dev','ngrok-free.pizza','ngrok.pizza'] },
+    { id:'cf', name:'Cloudflare Quick Tunnel', kind:'tunnel', suffix:['trycloudflare.com'] },
+    { id:'lt', name:'localtunnel', kind:'tunnel', suffix:['loca.lt'] },
+    { id:'serveo', name:'Serveo', kind:'tunnel', suffix:['serveo.net'] },
+    { id:'pinggy', name:'Pinggy', kind:'tunnel', suffix:['pinggy.io'] },
+    { id:'lx', name:'LocalXpose', kind:'tunnel', suffix:['localxpose.io'] },
+    { id:'lhr', name:'localhost.run', kind:'tunnel', suffix:['localhost.run','lhr.life'] },
+    { id:'ltrun', name:'lt.run', kind:'tunnel', suffix:['lt.run'] },
+    { id:'nip', name:'nip.io', kind:'dns', suffix:['nip.io'] },
+    { id:'sslip', name:'sslip.io', kind:'dns', suffix:['sslip.io'] }
+  ];
+
+  const TXT = {
+    ar: { title:'استخبارات الأنفاق (Tunnel Intel)', sub:'فحص هيكل الروابط لاكتشاف شبكات الأنفاق المخفية',
+      whyT:'تحليل حالة النفق:',
+      normal:'الرابط لا يمر عبر خدمات أنفاق مخفية (Tunneling Service)، ويعمل بشكل مباشر.',
+      whyTunnel:(p)=>`الرابط بيوصّل لسيرفرات ${p}، والجهاز الحقيقي بيتصل منها للخارج.`,
+      facts:'بيانات النفق', prov:'المزوّد', tid:'معرّف النفق', tier:'نوع الحساب', ip:'IP ظاهر في الاسم',
+      tierV:{ free:'مجاني', paid:'مدفوع', noacct:'بدون حساب (Quick Tunnel)', unk:'غير معروف' },
+      none:'—', repT:'بلاغ جاهز لمزوّد النفق', copy:'نسخ', copied:'تم النسخ ✓',
+      todoT:'ملاحظات أمنية:', todo:['الرابط يخضع لمعايير الفحص الطبيعي.'] },
+    en: { title:'Tunnel Intel', sub:'Analyzing link structure for hidden tunneling services',
+      whyT:'Tunnel Status:',
+      normal:'The link does not pass through hidden tunneling services and operates directly.',
+      whyTunnel:(p)=>`The link points to ${p} servers, and the real machine connects outward to them.`,
+      facts:'Tunnel facts', prov:'Provider', tid:'Tunnel ID', tier:'Account type', ip:'IP visible in the name',
+      tierV:{ free:'Free', paid:'Paid', noacct:'No account (Quick Tunnel)', unk:'Unknown' },
+      none:'—', repT:'Ready-to-send report', copy:'Copy', copied:'Copied ✓',
+      todoT:'Security notes:', todo:['The link follows standard inspection criteria.'] }
+  };
+
+  const validIp = a => a.length === 4 && a.every(n => /^\d{1,3}$/.test(n) && +n <= 255);
+  const isPriv = ip => /^(10\.|127\.|192\.168\.|169\.254\.|172\.(1[6-9]|2\d|3[01])\.|0\.)/.test(ip);
+
+  function analyze(urlObj) {
+    const host = urlObj.hostname.toLowerCase();
+    const p = PROVIDERS.find(x => x.suffix.some(s => host === s || host.endsWith('.' + s)));
+    if (!p) return null;
+    const suffix = p.suffix.find(s => host === s || host.endsWith('.' + s));
+    const sub = host.slice(0, Math.max(0, host.length - suffix.length - 1));
+    const tid = sub ? sub.split('.')[0] : '';
+    let tier = 'unk';
+    if (p.id === 'ngrok') tier = /(^|\.)ngrok-free\.(app|dev|pizza)$/.test(host) ? 'free' : /(^|\.)ngrok\.app$/.test(host) ? 'paid' : 'unk';
+    if (p.id === 'cf') tier = 'noacct';
+
+    let ip = null, ipKind = null;
+    if (p.kind === 'dns') {
+      const m = sub.match(/(?:^|[.-])(\d{1,3})[.-](\d{1,3})[.-](\d{1,3})[.-](\d{1,3})$/);
+      if (m && validIp(m.slice(1))) { ip = m.slice(1).join('.'); ipKind = isPriv(ip) ? 'priv' : 'ok'; }
+    } else if (p.id === 'ngrok') {
+      const m = tid.match(/^[0-9a-f]{3,4}(?:-\d{1,3}){4}$/i);
+      if (m) { const a = tid.split('-').slice(1); if (validIp(a)) { ip = a.join('.'); ipKind = isPriv(ip) ? 'priv' : 'weak'; } }
+    }
+    return { p, tid, tier, ip, ipKind, host };
+  }
+
+  const defang = u => `${u.protocol.replace(/^http/i, 'hxxp')}//${u.host.replace(/\./g, '[.]')}${u.pathname}${u.search}${u.hash}`.replace(/@/g, '[@]');
+  async function sha256(s) {
+    try { const d = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)); return [...new Uint8Array(d)].map(x => x.toString(16).padStart(2, '0')).join(''); }
+    catch (e) { return 'n/a'; }
+  }
+
+  // ---- بناء الكارت الأساسي وإضافته مخفياً لحين انتهاء الفحص ----
+  const card = document.createElement('div');
+  card.id = 'tunnelCard';
+  card.className = 'hidden glass-card p-6 sm:p-7 rounded-3xl border border-yellow-500/30 mb-8 mt-6';
+  const targetAnchor = document.getElementById('kitCard') || document.getElementById('statusCard') || document.getElementById('enginesGrid');
+  if (targetAnchor) {
+    targetAnchor.insertAdjacentElement('afterend', card);
+  }
+
+  async function fill(urlObj, heuristics) {
+    const t = TXT[L()];
+    const r = analyze(urlObj);
+    
+    if (!r) {
+      // حتى لو الرابط عادي ومش نفق، هنعمل له شكل يثبت إنه ظهر وتفحص
+      card.innerHTML = `
+        <div class="flex items-center justify-between gap-3 mb-4">
+          <div class="flex items-center gap-3"><div class="p-2 bg-yellow-500/10 rounded-xl text-yellow-400"><i data-lucide="cable" class="w-5 h-5"></i></div>
+            <div><h3 class="text-lg font-bold text-white">${t.title}</h3><p class="text-xs text-gray-400">${t.sub}</p></div></div>
+          <span class="text-xs font-bold px-3 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-300">Direct Link</span>
+        </div>
+        <div class="p-4 rounded-2xl border border-emerald-500/20 bg-emerald-950/20 text-sm text-emerald-100">${t.normal}</div>`;
+      card.classList.remove('hidden');
+      if (window.lucide) lucide.createIcons();
+      return;
+    }
+
+    const p = r.p;
+    const sigs = [];
+    (heuristics.findings || []).forEach(f => sigs.push(strip(f)));
+    if (window.__lastDNA) window.__lastDNA.sigs.slice().sort((a, b) => b.w - a.w).slice(0, 4).forEach(s => sigs.push(s.text));
+    const sigText = sigs.length ? [...new Set(sigs)].map(x => '- ' + x).join('\n') : '- No signatures';
+    const tm = new Date().toISOString(), fp = await sha256(urlObj.href);
+    const report = `Abuse report — tunneling service detected\nURL: ${defang(urlObj)}\nTunnel ID: ${r.tid || 'none'}`;
+
+    const why = t.whyTunnel(p.name);
+    const ipTxt = r.ip ? r.ip : t.none;
+    const row = (k, v, c) => `<tr class="border-t border-gray-800"><td class="py-1.5 pe-3 text-gray-500 whitespace-nowrap align-top">${k}</td><td class="${c || 'text-gray-200'} break-words">${v}</td></tr>`;
+
+    card.innerHTML = `
+      <div class="flex items-center justify-between gap-3 mb-4">
+        <div class="flex items-center gap-3"><div class="p-2 bg-yellow-500/10 rounded-xl text-yellow-400"><i data-lucide="cable" class="w-5 h-5"></i></div>
+          <div><h3 class="text-lg font-bold text-white">${t.title}</h3><p class="text-xs text-gray-400">${t.sub}</p></div></div>
+        <span class="text-xs font-bold px-3 py-1 rounded-full border border-yellow-500/30 bg-yellow-500/10 text-yellow-300">${esc(p.name)}</span>
+      </div>
+      <div class="p-4 rounded-2xl border border-yellow-500/20 bg-yellow-950/20 text-sm text-yellow-100 mb-4"><div class="font-bold mb-1">${t.whyT}</div>${esc(why)}</div>
+      <div class="text-sm font-bold text-white mb-2">${t.facts}</div>
+      <table class="w-full text-xs mb-4"><tbody>
+        ${row(t.prov, esc(p.name))}${row(t.tid, `<span dir="ltr" class="font-mono">${esc(r.tid || t.none)}</span>`)}${row(t.tier, esc(t.tierV[r.tier]))}
+        ${row(t.ip, esc(ipTxt), 'text-amber-300')}</tbody></table>
+      <div class="text-xs text-gray-400 mb-1">${t.repT}</div>
+      <textarea id="tunRep" readonly rows="5" dir="ltr" class="w-full bg-gray-950/80 border border-gray-800 rounded-xl p-3 text-xs text-gray-200 font-mono">${esc(report)}</textarea>
+      <button id="tunCopy" class="mt-2 bg-gradient-to-r from-yellow-600 to-amber-600 text-white text-xs font-bold px-5 py-2 rounded-xl">${t.copy}</button>`;
+    
+    card.classList.remove('hidden');
+    const b = document.getElementById('tunCopy');
+    if (b) {
+      b.onclick = () => { 
+        const done = () => { b.innerText = t.copied; setTimeout(() => b.innerText = t.copy, 1500); };
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(report).then(done);
+      };
+    }
+    if (window.lucide) lucide.createIcons();
+  }
+
+  const origRender = renderScanOutput;
+  renderScanOutput = function (urlObj, heuristics, aiText) {
+    origRender(urlObj, heuristics, aiText);
+    fill(urlObj, heuristics);
+  };
+  window.__tunnel = { analyze };
+})();
+</script>
+
+
+</body>
+</html>
